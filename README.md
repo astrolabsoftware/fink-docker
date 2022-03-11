@@ -50,7 +50,7 @@ The images are quite big because of dependencies:
 |--------|------|
 | centos7| 204MB|
 | +system build dependencies|   822MB |
-| +Apache Kafka, HBase and Spark|    1.94GB  |
+| +Apache Kafka, HBase and Spark|    1.39GB  |
 | +Python dependencies|  3.62GB    |
 
 Todo:
