@@ -71,6 +71,8 @@ wget --quiet https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-
 tar -xf spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}.tgz
 rm spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}.tgz
 
+export SPARK_HOME=$PWD/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}
+
 echo "spark.yarn.jars=${SPARK_HOME}/jars/*.jar" > ${SPARK_HOME}/conf/spark-defaults.conf
 
 if [[ $SPARK_VERSION == 2* ]]; then

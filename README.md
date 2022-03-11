@@ -99,7 +99,7 @@ Todo:
 
 We have deployed images in DockerHub, than can be used easily:
 
-| image name | based on |
-|------------|----------|
-| [julienpeloton/fink-ci:prod]() | [centos7](centos7) |
-| [julienpeloton/fink-ci:dev]() | [centos9stream](centos9stream) |
+| image name | based on | Size (compressed) |
+|------------|----------|-------------------|
+| [julienpeloton/fink-ci:prod]() | [centos7](centos7) | |
+| [julienpeloton/fink-ci:dev]() | [centos9stream](centos9stream) | |
