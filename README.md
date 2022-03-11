@@ -87,6 +87,21 @@ Note that when starting a container, a script is launched to automatically start
 
 See https://docs.docker.com/docker-hub/repos/#pushing-a-docker-container-image-to-docker-hub.
 
+Example:
+
+```bash
+$ docker images
+REPOSITORY                TAG       IMAGE ID       CREATED          SIZE
+julienpeloton/fink-ci     prod      d5ee1c3b1299   20 minutes ago   3.15GB
+
+$ docker push julienpeloton/fink-ci:prod
+The push refers to repository [docker.io/julienpeloton/fink-ci]
+d3eeb8e94cd6: Pushed
+970209ec3e0c: Pushing [============================================>      ]  2.258GB/2.542GB
+529806cc03af: Pushed
+174f56854903: Mounted from library/centos
+```
+
 ### Create your own image
 
 To create your own image with the versions you want, you would create a new folder, and copy files from an existing one (`centos7` or `centos9stream`). Then modify the values in the `ARG` in the Dockerfile. Change the base image if you wish. And then build it using:
