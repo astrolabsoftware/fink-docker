@@ -90,6 +90,7 @@ ENV SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}
 ENV KAFKA_HOME=$USRLIBS/kafka
 ENV SPARKLIB=${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.7-src.zip
 ENV PATH=${USRLIBS}/miniconda/bin:${SPARK_HOME}/bin:${SPARK_HOME}/sbin:/usr/local/bin:${PATH}
+ENV BINPATH=$PATH
 ENV PYTHONPATH=${SPARKLIB}:${PYTHONPATH}
 
 WORKDIR $USRLIBS
@@ -102,5 +103,7 @@ RUN yum -y update \
 && yum -y clean all \
 && rm -rf /var/cache \
 && echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
+
+ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
 ENTRYPOINT source scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
