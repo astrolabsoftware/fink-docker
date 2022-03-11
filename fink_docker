@@ -17,12 +17,13 @@ set -e
 message_help="""
 Build Dockerfile image for Fink\n\n
 Usage:\n
-    ./build.sh [--os] [--tag] [--build] [--run] [--deploy] [-h] \n\n
+    ./fink_docker [--os] [--tag] [--build] [--run] [--deploy] [-h] \n\n
 
 Specify the name of a folder with a Dockerfile with the option --os.\n
-By default, the script will build the image (--build), with a tag (--tag).\n
-Use --run to enter the container instead, or --deploy to deploy it in the DockerHub.\n
-For the deployment, you need to have and defined.\n
+Use --build to build the image, with a tag (--tag).\n
+Use --run with a tag (--tag) to enter the container instead\n
+Use --deploy with a tag (--tag) to deploy it in the DockerHub.\n
+For the deployment, you need to have credentials defined.\n
 Use -h to display this help.
 """
 
@@ -33,7 +34,7 @@ if [[ $1 == "" ]]; then
 fi
 
 # Grab the command line arguments
-BUILD=true
+BUILD=false
 RUN=false
 DEPLOY=false
 while [ "$#" -gt 0 ]; do
