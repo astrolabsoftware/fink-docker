@@ -68,8 +68,8 @@ The current versions use the soft multi-stage strategy.
 
 |        | size |
 |--------|------|
-| prod   |  3.62GB    |
-| dev   |  4.0GB    |
+| prod   |  3.15GB    |
+| dev   |  3.35GB    |
 
 Todo:
 - [ ] Inspect better Python dependencies.
@@ -97,7 +97,7 @@ julienpeloton/fink-ci     prod      d5ee1c3b1299   20 minutes ago   3.15GB
 $ docker push julienpeloton/fink-ci:prod
 The push refers to repository [docker.io/julienpeloton/fink-ci]
 d3eeb8e94cd6: Pushed
-970209ec3e0c: Pushing [============================================>      ]  2.258GB/2.542GB
+970209ec3e0c: Pushed
 529806cc03af: Pushed
 174f56854903: Mounted from library/centos
 ```
@@ -115,9 +115,9 @@ Todo:
 
 ## Image availability
 
-We have deployed images in DockerHub, than can be used easily:
+We have deployed images in DockerHub ([julienpeloton/fink-ci](https://hub.docker.com/repository/docker/julienpeloton/fink-ci)), than can be used easily:
 
 | image name | based on | Size (compressed) |
 |------------|----------|-------------------|
-| [julienpeloton/fink-ci:prod]() | [centos7](centos7) | |
-| [julienpeloton/fink-ci:dev]() | [centos9stream](centos9stream) | |
+| julienpeloton/fink-ci:prod | [centos7](centos7) | 1.31GB |
+| julienpeloton/fink-ci:dev | [centos9stream](centos9stream) | 1.36GB |
