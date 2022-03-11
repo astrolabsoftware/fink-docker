@@ -39,7 +39,7 @@ RUN yum -y update \
 && rm -rf /var/cache \
 && echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
 
-# # install python
+# install python
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
 && bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda
 
