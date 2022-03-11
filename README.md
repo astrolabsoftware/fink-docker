@@ -24,11 +24,14 @@ The production environment is currently in use at VirtualData, Université Paris
 Build Dockerfile image for Fink
 
  Usage:
- ./fink_docker [--os] [--tag] [--build] [--run] [-h]
+ ./fink_docker [-h]
+ ./fink_docker --build [--os] [--tag]
+ ./fink_docker --run [--tag]
 
  Specify the name of a folder with a Dockerfile with the option --os.
- Use --build to build the image, with a tag (--tag).
+ Use --build to build the image from the Dockerfile in --os, with a tag (--tag).
  Use --run with a tag (--tag) to enter the container instead
+ For the deployment, you need to have credentials defined.
  Use -h to display this help.
 ```
 
