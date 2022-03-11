@@ -52,6 +52,6 @@ if [[ $KAFKA_VERSION == "" ]]; then
   exit
 fi
 
-wget --quiet --no-check-certificate https://www.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz
+wget --quiet --no-check-certificate https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz
 tar -zxvf kafka_2.12-${KAFKA_VERSION}.tgz
 rm kafka_2.12-${KAFKA_VERSION}.tgz
