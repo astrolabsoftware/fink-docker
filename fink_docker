@@ -19,13 +19,11 @@ Build Dockerfile image for Fink\n\n
 Usage:\n
     ./fink_docker [-h] \n
     ./fink_docker --build [--os] [--tag] \n
-    ./fink_docker --run [--tag] \n
-    ./fink_docker --deploy [--tag] \n\n
+    ./fink_docker --run [--tag] \n\n
 
 Specify the name of a folder with a Dockerfile with the option --os.\n
 Use --build to build the image from the Dockerfile in --os, with a tag (--tag).\n
 Use --run with a tag (--tag) to enter the container instead\n
-Use --deploy with a tag (--tag) to deploy it in the DockerHub.\n
 For the deployment, you need to have credentials defined.\n
 Use -h to display this help.
 """
