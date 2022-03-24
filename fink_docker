@@ -18,7 +18,7 @@ message_help="""
 Build Dockerfile image for Fink\n\n
 Usage:\n
     ./fink_docker [-h] \n
-    ./fink_docker --build [--os] [--tag] \n
+    ./fink_docker --build [--os] [--tag] [--verbose] \n
     ./fink_docker --run [--tag] \n\n
 
 Specify the name of a folder with a Dockerfile with the option --os.\n
@@ -38,6 +38,7 @@ fi
 BUILD=false
 RUN=false
 DEPLOY=false
+VERBOSE=false
 while [ "$#" -gt 0 ]; do
   case "$1" in
     -h)
@@ -72,6 +73,10 @@ while [ "$#" -gt 0 ]; do
         DEPLOY=true
         shift 1
         ;;
+    --verbose)
+        VERBOSE=true
+        shift 1
+        ;;
   esac
 done
 
@@ -85,8 +90,12 @@ if [[ $BUILD == true ]]; then
     echo `docker build --help | grep "tag list"`
     exit
   fi
+  EXTRA_ARGS=""
+  if [[ $VERBOSE == true ]]; then
+    EXTRA_ARGS="--progress=plain"
+  fi
   echo "Building ${OS_NAME}"
-  docker build -f ${OS_NAME}/Dockerfile -t ${TAG} .
+  docker build $EXTRA_ARGS -f ${OS_NAME}/Dockerfile -t ${TAG} .
 elif [[ $RUN == true ]]; then
   if [[ $TAG == "" ]]; then
     echo "You need to specify the image name with the option --tag."
