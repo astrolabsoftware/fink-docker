@@ -14,8 +14,9 @@ astropy
 astroquery
 fink_filters>=1.6
 fink_science>=0.5.1
-scipy==1.4.1
+scipy
 scikit-learn==0.23
+scikit-image
 healpy
 fink-tns>=0.6
 
