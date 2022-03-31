@@ -12,7 +12,7 @@ codecov
 slackclient
 astropy
 astroquery
-fink_filters>=1.6
+fink_filters>=1.7
 fink_science>=0.5.1
 scipy
 scikit-learn==0.23
@@ -29,3 +29,7 @@ h5py
 natsort
 colorama
 seaborn
+
+# SNAD
+light-curve-python>=0.3.5
+light-curve>=0.4.0
