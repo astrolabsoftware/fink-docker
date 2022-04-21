@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ARG PYTHON_VERSION=py37_4.11.0
-ARG SPARK_VERSION=2.4.7
+ARG SPARK_VERSION=3.1.3
 ARG HBASE_VERSION=2.2.7
 ARG KAFKA_VERSION=2.1.0
 ARG HADOOP_VERSION=hadoop2.7
@@ -88,7 +88,7 @@ ENV USRLIBS /home/libs
 
 ENV SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}
 ENV KAFKA_HOME=$USRLIBS/kafka
-ENV SPARKLIB=${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.7-src.zip
+ENV SPARKLIB=${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.9-src.zip
 ENV PATH=${USRLIBS}/miniconda/bin:${SPARK_HOME}/bin:${SPARK_HOME}/sbin:/usr/local/bin:${PATH}
 ENV BINPATH=$PATH
 ENV PYTHONPATH=${SPARKLIB}:${PYTHONPATH}
