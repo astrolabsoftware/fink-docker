@@ -9,7 +9,7 @@ We mainly use these in the Continuous Integration of various repositories. We cu
 | | development | production |
 |-|-----|------|
 | OS | centos 9 stream| centos7|
-| Spark | 3.1.3 | 2.4.7 |
+| Spark | 3.1.3 | 3.1.3 |
 | Hadoop | 3.2 | 2.7|
 | Java |11 | 8|
 | HBase | 2.4.10 | 2.2.7 |
