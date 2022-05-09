@@ -18,7 +18,7 @@ message_help="""
 Build Dockerfile image for Fink\n\n
 Usage:\n
     ./fink_docker [-h] \n
-    ./fink_docker --build [--os] [--tag] [--verbose] \n
+    ./fink_docker --build [--os] [--tag] [--verbose] [--astronet-token] \n
     ./fink_docker --run [--tag] \n\n
 
 Specify the name of a folder with a Dockerfile with the option --os.\n
