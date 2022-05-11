@@ -2,7 +2,7 @@
 numpy>=1.17
 coverage>=4.2
 coveralls
-pandas==1.1.5
+pandas==1.3.5
 confluent-kafka>=0.11.4
 avro-python3
 Cython
@@ -13,7 +13,7 @@ slackclient
 astropy
 astroquery
 fink_filters>=2.2
-fink_science>=1.1.0
+fink_science>=1.2.0
 fink-utils>=0.2.2
 scipy
 scikit-learn==0.23
