@@ -51,7 +51,7 @@ if [[ $TOKEN != "" ]]; then
     pip install george
     pip install imbalanced-learn==0.7.0
     pip install optuna==2.3.0
-    pip install tensorflow==2.4.1
+    pip install tensorflow==2.8.0
 else
     echo "You did not provide a token for astronet -- installation skipped"
 fi
