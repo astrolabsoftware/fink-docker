@@ -36,7 +36,7 @@ light-curve-python>=0.3.5
 light-curve>=0.4.0
 
 # kilonova @ sklearn==0.23
--e git+https://github.com/b-biswas/kndetect.git@426399d21b912c4d2a3d2a0324dc96d97198645f
+-e git+https://github.com/b-biswas/kndetect.git@426399d21b912c4d2a3d2a0324dc96d97198645f#egg=kndetect
 
 # fink-fat
 fink-fat
