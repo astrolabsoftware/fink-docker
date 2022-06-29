@@ -13,10 +13,10 @@ slackclient
 astropy
 astroquery
 fink_filters>=2.2
-fink_science>=1.3.0
-fink-utils>=0.5.0
+fink_science>=2.0.0
+fink-utils>=0.6.0
 scipy
-scikit-learn==0.23
+scikit-learn==1.0.2
 scikit-image
 healpy
 fink-tns>=0.6
@@ -35,8 +35,8 @@ seaborn
 light-curve-python>=0.3.5
 light-curve>=0.4.0
 
-# kilonova @ sklearn==0.23
--e git+https://github.com/b-biswas/kndetect.git@426399d21b912c4d2a3d2a0324dc96d97198645f#egg=kndetect
+# kilonova @ sklearn==1.0.2
+-e git+https://github.com/b-biswas/kndetect@kndetect#egg=kndetect
 
 # fink-fat
 fink-fat
