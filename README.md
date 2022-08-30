@@ -13,7 +13,7 @@ We mainly use these in the Continuous Integration of various repositories. We cu
 | Hadoop | 3.2 | 2.7|
 | Java |11 | 8|
 | HBase | 2.4.10 | 2.2.7 |
-| Kafka | 2.8.1 | 2.1.0 |
+| Kafka | 2.8.1 | 3.1.0 |
 
 The production environment is currently in use at VirtualData, Université Paris-Saclay, to process the ZTF alert stream.
 
