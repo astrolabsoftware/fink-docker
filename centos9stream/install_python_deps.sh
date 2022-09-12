@@ -47,7 +47,7 @@ pip install --no-cache-dir torch==1.9.1+cpu -f https://download.pytorch.org/whl/
 
 # Installation of astronet
 if [[ $TOKEN != "" ]]; then
-    pip install --no-dependencies git+https://${TOKEN}@github.com/tallamjr/astronet.git
+    pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
     pip install george
     pip install imbalanced-learn==0.7.0
     pip install optuna==2.3.0
