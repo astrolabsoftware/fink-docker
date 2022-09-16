@@ -18,32 +18,13 @@ set -e
 message_help="""
 Install Python dependencies for fink-broker through pip\n\n
 Usage:\n
-    \t./install_python_deps.sh [--astronet-token]\n\n
-
-You need a valid GitHub token to install astronet, otherwise
-it will be skipped (but you will not be able to use the T2 module).
+    \t./install_python_deps.sh \n\n
 """
-
-# Grab the command line arguments
-TOKEN=
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --astronet-token)
-        TOKEN="$2"
-        shift 2
-        ;;
-    -h)
-        echo -e $message_help
-        exit
-        ;;
-  esac
-done
-
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
 # Installation of torch without GPU support (lighter)
-pip install --no-cache-dir torch==1.9.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 # Installation of astronet
 if [[ $TOKEN != "" ]]; then

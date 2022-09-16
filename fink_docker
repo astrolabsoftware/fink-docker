@@ -18,7 +18,7 @@ message_help="""
 Build Dockerfile image for Fink\n\n
 Usage:\n
     ./fink_docker [-h] \n
-    ./fink_docker --build [--os] [--tag] [--verbose] [--astronet-token] \n
+    ./fink_docker --build [--os] [--tag] [--verbose] \n
     ./fink_docker --run [--tag] \n\n
 
 Specify the name of a folder with a Dockerfile with the option --os.\n
@@ -39,7 +39,6 @@ BUILD=false
 RUN=false
 DEPLOY=false
 VERBOSE=false
-ASTRONETTOKEN=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
     -h)
@@ -74,10 +73,6 @@ while [ "$#" -gt 0 ]; do
         DEPLOY=true
         shift 1
         ;;
-    --astronet-token)
-        ASTRONETTOKEN="$2"
-        shift 2
-        ;;
     --verbose)
         VERBOSE=true
         shift 1
@@ -100,9 +95,6 @@ if [[ $BUILD == true ]]; then
     EXTRA_ARGS="--progress=plain"
   fi
   BUILD_ARGS=""
-  if [[ $ASTRONETTOKEN != "" ]]; then
-      BUILD_ARGS="--build-arg ASTRONETTOKEN=$ASTRONETTOKEN"
-  fi
   echo "Building ${OS_NAME}"
   docker build $EXTRA_ARGS $BUILD_ARGS -f ${OS_NAME}/Dockerfile -t ${TAG} .
 elif [[ $RUN == true ]]; then
