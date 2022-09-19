@@ -27,12 +27,8 @@ pip install --no-cache-dir -r requirements.txt
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 # Installation of astronet
-if [[ $TOKEN != "" ]]; then
-    pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
-    pip install george
-    pip install imbalanced-learn==0.7.0
-    pip install optuna==2.3.0
-    pip install tensorflow==2.8.0
-else
-    echo "You did not provide a token for astronet -- installation skipped"
-fi
+pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
+pip install george
+pip install imbalanced-learn==0.7.0
+pip install optuna==2.3.0
+pip install tensorflow==2.8.0
