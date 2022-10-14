@@ -47,4 +47,4 @@ iminuit==2.11.2
 -e git+https://github.com/b-biswas/kndetect@kndetect#egg=kndetect
 
 # fink-fat
-fink-fat
+-e git+https://github.com/FusRoman/fink-fat.git@6dcebaee620abb9fb49ea1db9c254300becbea04 --no-dependencies
