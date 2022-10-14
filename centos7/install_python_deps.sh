@@ -23,6 +23,9 @@ Usage:\n
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
+# Fink-fat
+pip install --no-dependencies git+https://github.com/FusRoman/fink-fat.git@6dcebaee620abb9fb49ea1db9c254300becbea04
+
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
