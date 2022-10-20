@@ -30,7 +30,7 @@ tensorflow_addons
 -e git+https://github.com/JulienPeloton/LIA.git@4513654b15a0760312eff2661b0fcf4989171ce3#egg=LIA
 
 # supernnova -- elasticc branch
--e git+https://github.com/supernnova/SuperNNova.git@afb05fb66ea96ef869cf30150b422ad769ea9ecb#egg=supernnova
+-e git+https://github.com/supernnova/SuperNNova.git@1a306410966222f68e57ddd38d4fd6bc2e929cdc#egg=supernnova
 h5py
 natsort
 colorama
