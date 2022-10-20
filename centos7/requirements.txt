@@ -12,8 +12,8 @@ codecov
 slackclient
 astropy
 astroquery
-fink_filters>=2.2
-fink-science>=3.2.0
+fink_filters>=3.5
+fink-science>=3.7.0
 fink-utils>=0.8.0
 scipy
 scikit-learn==1.0.2
