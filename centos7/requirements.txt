@@ -3,7 +3,8 @@ numpy>=1.17
 coverage>=4.2
 coveralls
 pandas==1.3.5
-confluent-kafka>=0.11.4
+# > 1.9. see https://github.com/edenhill/librdkafka/issues/3263
+confluent-kafka==1.9.2
 avro-python3
 Cython
 fastavro
