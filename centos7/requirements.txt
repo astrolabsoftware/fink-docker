@@ -14,7 +14,7 @@ slackclient
 astropy
 astroquery
 fink_filters>=3.7
-fink-science>=3.10.1
+fink-science>=3.11.1
 fink-utils>=0.8.0
 scipy
 scikit-learn==1.0.2
