@@ -1,3 +1,10 @@
+# DEPRECATED
+
+This is no longer supported, please consider using:
+- https://github.com/astrolabsoftware/k8s-spark-py (build Spark image for k8s)
+- https://github.com/astrolabsoftware/fink-broker (run fink-broker on k8s)
+instead.
+
 # Dockerfiles for Fink
 
 This repository contains Dockerfiles used in the context of [Fink](https://github.com/astrolabsoftware/fink-broker).
