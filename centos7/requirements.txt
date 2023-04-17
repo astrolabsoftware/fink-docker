@@ -22,7 +22,7 @@ scikit-image
 healpy
 fink-tns>=0.6
 tensorflow_addons==0.18.0
-slackclient
+slack_sdk
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@e16152091ff8f9ece8d4823e8da1f498d60ac45f#egg=actsnfink
