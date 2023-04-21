@@ -9,8 +9,6 @@ avro-python3
 Cython
 fastavro==1.6.0
 pyarrow==9.0.0
-codecov
-slackclient
 astropy
 astroquery
 fink_filters>=3.9
@@ -32,7 +30,7 @@ slack_sdk
 -e git+https://github.com/JulienPeloton/LIA.git@4513654b15a0760312eff2661b0fcf4989171ce3#egg=LIA
 
 # supernnova -- elasticc branch
--e git+https://github.com/supernnova/SuperNNova.git@1a306410966222f68e57ddd38d4fd6bc2e929cdc#egg=supernnova
+-e git+https://github.com/supernnova/SuperNNova.git@7765ac51843997a9e6df4ff866f416ab48010fa2#egg=supernnova
 h5py
 natsort
 colorama

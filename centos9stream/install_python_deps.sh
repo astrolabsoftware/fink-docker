@@ -38,5 +38,5 @@ pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
 pip install george
 pip install imbalanced-learn==0.7.0
 pip install optuna==2.3.0
-pip install tensorflow==2.8.0
+pip install tensorflow==2.9.2
 pip install protobuf==3.20
