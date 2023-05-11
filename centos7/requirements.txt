@@ -12,8 +12,8 @@ pyarrow==9.0.0
 astropy
 astroquery
 fink_filters>=3.9
-fink-science>=3.13.3
-fink-utils>=0.8.0
+git+https://github.com/astrolabsoftware/fink-science@4.0.1
+fink-utils>=0.12.0
 scipy
 scikit-learn==1.0.2
 scikit-image
@@ -21,6 +21,8 @@ healpy
 fink-tns>=0.6
 tensorflow_addons==0.18.0
 slack_sdk
+aiohttp
+sbpy
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@e16152091ff8f9ece8d4823e8da1f498d60ac45f#egg=actsnfink
@@ -30,7 +32,7 @@ slack_sdk
 -e git+https://github.com/JulienPeloton/LIA.git@4513654b15a0760312eff2661b0fcf4989171ce3#egg=LIA
 
 # supernnova -- elasticc branch
--e git+https://github.com/supernnova/SuperNNova.git@7765ac51843997a9e6df4ff866f416ab48010fa2#egg=supernnova
+-e git+https://github.com/supernnova/SuperNNova.git@2f7f293606abb84d8e2bb515ae9238a08815ddfb#egg=supernnova
 h5py
 natsort
 colorama
