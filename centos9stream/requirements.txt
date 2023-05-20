@@ -12,8 +12,8 @@ pyarrow==9.0.0
 astropy
 astroquery
 fink_filters>=3.9
-git+https://github.com/astrolabsoftware/fink-science@4.0.1
-fink-utils>=0.12.0
+git+https://github.com/astrolabsoftware/fink-science@4.1.0
+fink-utils>=0.13.0
 scipy
 scikit-learn==1.0.2
 scikit-image
