@@ -12,8 +12,8 @@ pyarrow==9.0.0
 astropy
 astroquery
 fink_filters>=3.12
-git+https://github.com/astrolabsoftware/fink-science@4.2.0
-fink-utils>=0.13.3
+git+https://github.com/astrolabsoftware/fink-science@4.3.0
+fink-utils>=0.13.6
 scipy
 scikit-learn==1.0.2
 scikit-image
@@ -39,8 +39,7 @@ colorama
 seaborn
 
 # SNAD
-light-curve-python>=0.3.5
-light-curve>=0.4.0
+light-curve>=0.7.3
 
 # AGN
 iminuit==2.11.2
