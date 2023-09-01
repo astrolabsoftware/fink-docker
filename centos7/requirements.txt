@@ -12,20 +12,20 @@ pyarrow==9.0.0
 astropy
 astroquery
 fink_filters>=3.12
-git+https://github.com/astrolabsoftware/fink-science@4.3.0
-fink-utils>=0.13.6
+git+https://github.com/astrolabsoftware/fink-science@4.4.0
+fink-utils>=0.13.7
 scipy
 scikit-learn==1.0.2
 scikit-image
 healpy
 fink-tns>=0.6
 tensorflow_addons==0.18.0
-slack_sdk
+slack_sdk>=3.21.3
 aiohttp
 sbpy
 
 # Active learning
--e git+https://github.com/emilleishida/fink_sn_activelearning.git@e16152091ff8f9ece8d4823e8da1f498d60ac45f#egg=actsnfink
+-e git+https://github.com/emilleishida/fink_sn_activelearning.git@6c1d04c9581afa7343439beb726edf61d7a18608#egg=actsnfink
 -e git+https://github.com/COINtoolbox/ActSNClass.git@2c61da91a9d13834d39804fc35aeb3245ba20755#egg=actsnclass
 
 # microlensing
