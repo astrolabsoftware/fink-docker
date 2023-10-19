@@ -18,25 +18,16 @@ set -e
 message_help="""
 Install Python dependencies for fink-broker through pip\n\n
 Usage:\n
-    \t./install_python_deps.sh\n\n
+    \t./install_python_deps.sh \n\n
 """
-
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
 # Fink-fat
-pip install --no-dependencies git+https://github.com/FusRoman/fink-fat.git@6dcebaee620abb9fb49ea1db9c254300becbea04
+pip install --no-dependencies git+https://github.com/FusRoman/fink-fat.git@1e840a47372cc3fe31df3cf7b41caf60144aff63
 
-# Fink_GRB
-pip install --no-dependencies git+https://github.com/FusRoman/Fink_GRB.git@71e8b4d440da15911a37bc6db4908fefc94ccc6a
+# Fink_MM
+pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.7.zip
 
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-
-# Installation of astronet
-pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
-pip install george
-pip install imbalanced-learn==0.7.0
-pip install optuna==2.3.0
-pip install tensorflow==2.9.2
-pip install protobuf==3.20
