@@ -52,6 +52,14 @@ To build an image from a specific Dockerfile, use:
 ./fink_docker --build --os centos7 --tag prod
 ```
 
+You might need to modify resolvers though. In this case, just add in `/etc/resolv.conf`
+
+```
+nameserver 8.8.8.8
+```
+
+and restart docker before building your image.
+
 Without optimisation, the images are quite big because of dependencies. Here is the breakdown for the prod image with a single build stage (size on disk):
 
 |        | size |
