@@ -17,14 +17,10 @@ ARG SPARK_VERSION=3.1.3
 ARG HBASE_VERSION=2.2.7
 ARG KAFKA_VERSION=2.1.0
 ARG HADOOP_VERSION=hadoop2.7
-ARG ASTRONETTOKEN
 
 # Stage 1
 FROM centos:centos7 AS builder
 LABEL maintainer="peloton@lal.in2p3.fr"
-
-ARG ASTRONETTOKEN
-ENV ASTRONETTOKEN=$ASTRONETTOKEN
 
 ARG PYTHON_VERSION
 ENV PYTHON_VERSION=$PYTHON_VERSION
@@ -66,7 +62,7 @@ RUN source scripts/install_kafka.sh --version ${KAFKA_VERSION} \
 && source scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} \
 && cd $USRLIBS/centos7 \
 && pip install --no-cache-dir --upgrade pip setuptools wheel \
-&& source ./install_python_deps.sh --astronet-token $ASTRONETTOKEN \
+&& source ./install_python_deps.sh \
 && cd $USRLIBS \
 && find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
 

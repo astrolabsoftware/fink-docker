@@ -31,3 +31,9 @@ pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.
 
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
+# Installation of astronet
+pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
+pip install george
+pip install imbalanced-learn==0.7.0
+pip install optuna==2.3.0
