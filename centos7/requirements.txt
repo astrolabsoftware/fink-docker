@@ -21,10 +21,12 @@ healpy
 fink-tns>=0.9
 tensorflow==2.9.2
 tensorflow_addons==0.18.0
-protobuf==3.20
+protobuf==3.20.3
 slack_sdk>=3.21.3
 aiohttp
 sbpy
+onnx==1.12.0
+onnxruntime
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@bf8d4e263e02d42781642f872f7bc030c24792bc#egg=actsnfink
