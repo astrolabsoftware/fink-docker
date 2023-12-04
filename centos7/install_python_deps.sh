@@ -24,7 +24,7 @@ Usage:\n
 pip install --no-cache-dir -r requirements.txt
 
 # Fink-fat
-pip install --no-dependencies git+https://github.com/FusRoman/fink-fat.git@1e840a47372cc3fe31df3cf7b41caf60144aff63
+pip install --no-dependencies git+https://github.com/FusRoman/fink-fat/archive/v0.16.0.zip
 
 # Fink_MM
 pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.10.zip
