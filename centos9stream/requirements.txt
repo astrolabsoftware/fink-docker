@@ -11,9 +11,10 @@ fastavro==1.6.0
 pyarrow==9.0.0
 astropy
 astroquery
-fink_filters>=3.21
-git+https://github.com/astrolabsoftware/fink-science@5.0.0
+fink_filters>=3.22
+git+https://github.com/astrolabsoftware/fink-science@5.4.0
 fink-utils>=0.13.8
+fink-spins>=0.3.3
 scipy
 scikit-learn==1.0.2
 scikit-image
@@ -21,7 +22,6 @@ healpy
 fink-tns>=0.9
 tensorflow==2.9.2
 tensorflow_addons==0.18.0
-protobuf==3.20.3
 slack_sdk>=3.21.3
 aiohttp
 sbpy
