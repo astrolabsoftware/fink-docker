@@ -18,6 +18,7 @@ fink-spins>=0.3.3
 scipy
 scikit-learn==1.0.2
 scikit-image
+joblib==1.2.0
 healpy
 fink-tns>=0.9
 tensorflow==2.9.2
