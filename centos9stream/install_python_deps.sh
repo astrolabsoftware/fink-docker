@@ -23,6 +23,8 @@ Usage:\n
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
+pip install light-curve[full] --upgrade
+
 # Fink-fat
 pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.0.zip
 
