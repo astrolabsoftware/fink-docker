@@ -28,6 +28,7 @@ aiohttp
 sbpy
 onnx==1.12.0
 onnxruntime
+py4j
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@bf8d4e263e02d42781642f872f7bc030c24792bc#egg=actsnfink
