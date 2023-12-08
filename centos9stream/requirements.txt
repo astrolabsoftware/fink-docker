@@ -14,7 +14,7 @@ astroquery
 fink_filters>=3.22
 git+https://github.com/astrolabsoftware/fink-science@5.5.0
 fink-utils>=0.13.8
-fink-spins>=0.3.3
+fink-spins>=0.3.4
 scipy
 scikit-learn==1.0.2
 scikit-image
@@ -29,6 +29,15 @@ sbpy
 onnx==1.12.0
 onnxruntime
 py4j
+
+gcn-kafka==0.3.0
+voevent-parse==1.0.3
+tabulate==0.9.0
+jsonschema==4.6.0
+astropy_healpix==0.7
+hdfs==2.7.2
+importlib-resources==5.9.0
+pandera==0.14.5
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@4f46b3a1e29de45793125452974e71e92c1ea454#egg=actsnfink
@@ -45,7 +54,7 @@ colorama
 seaborn
 
 # AGN
-iminuit==2.11.2
+iminuit==2.21.0
 
 # kilonova @ sklearn==1.0.2
 -e git+https://github.com/b-biswas/kndetect@kndetect#egg=kndetect
