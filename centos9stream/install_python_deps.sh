@@ -29,7 +29,7 @@ pip install light-curve[full] --upgrade
 pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.1.zip
 
 # Fink_MM
-pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.10.zip
+pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.12.zip
 
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
