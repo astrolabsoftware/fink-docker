@@ -19,7 +19,7 @@ The code is currently checked on `Almalinux:9`.
 | | Latest |
 |-|-----|
 | OS | AlmaLinux 9 |
-| Spark | 3.1.3 |
+| Spark | 3.4.1 |
 | Hadoop | 3.2 |
 | Java |11 |
 | HBase | 2.4.10 |
