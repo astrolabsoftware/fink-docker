@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019-2022 AstroLab Software
+# Copyright 2019-2024 AstroLab Software
 # Author: Julien Peloton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,14 @@ Usage:\n
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
+# See https://github.com/astrolabsoftware/fink-science/pull/381
+pip install light-curve[full]==0.8.1
+
 # Fink-fat
-pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.0.zip
+pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.1.zip
 
 # Fink_MM
-pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.16.10.zip
+pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.20.1.zip
 
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html

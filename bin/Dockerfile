@@ -1,4 +1,4 @@
-# Copyright 2022 AstroLab Software
+# Copyright 2022-2024 AstroLab Software
 # Author: Julien Peloton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@ ARG HBASE_VERSION=2.4.10
 ARG KAFKA_VERSION=2.8.1
 ARG HADOOP_VERSION=hadoop3
 
-FROM quay.io/centos/centos:stream9 AS builder
+FROM almalinux:9 AS builder
 LABEL maintainer="peloton@lal.in2p3.fr"
 
 ARG PYTHON_VERSION
