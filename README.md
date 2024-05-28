@@ -2,9 +2,19 @@
 
 This repository contains the Dockerfile to build all-in-one image for Fink. For k8s deployment, see https://github.com/astrolabsoftware/fink-broker instead.
 
-## Worflow
+## Workflow
 
-We mainly use these in the Continuous Integration of various repositories. The image is built at each release of this repository. The code is currently checked on `Almalinux:9`. 
+We mainly use these in the Continuous Integration of various repositories. The image is built at each release of this repository: 
+
+```
+# push modifications
+git tag <number>
+git push origin --tags
+
+# then publish release on GH
+```
+
+The code is currently checked on `Almalinux:9`. 
 
 | | Latest |
 |-|-----|
