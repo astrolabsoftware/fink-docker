@@ -59,3 +59,7 @@ iminuit==2.21.0
 
 # kilonova @ sklearn==1.0.2
 -e git+https://github.com/b-biswas/kndetect@kndetect#egg=kndetect
+
+# Profiling
+line_profiler==4.1.3
+codecarbon==2.5.0
