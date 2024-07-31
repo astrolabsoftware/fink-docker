@@ -11,7 +11,7 @@ fastavro==1.6.0
 pyarrow==9.0.0
 astropy
 astroquery
-fink_filters>=3.31
+fink_filters>=3.32
 git+https://github.com/astrolabsoftware/fink-science@5.11.0
 fink-utils>=0.17.5
 fink-spins>=0.3.8
