@@ -45,7 +45,7 @@ COPY . .
 
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
-&& dnf -y install lsof which git wget \
+&& dnf -y install lsof which git wget procps\
 && dnf -y groupinstall "Development Tools" \
 && dnf -y clean all \
 && rm -rf /var/cache \
