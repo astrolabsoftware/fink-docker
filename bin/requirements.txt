@@ -11,9 +11,9 @@ fastavro==1.6.0
 pyarrow==9.0.0
 astropy
 astroquery
-fink_filters>=3.32
-git+https://github.com/astrolabsoftware/fink-science@5.14.0
-fink-utils>=0.17.5
+fink_filters>=3.34
+git+https://github.com/astrolabsoftware/fink-science@5.15.0
+fink-utils>=0.20.0
 fink-spins>=0.3.8
 scipy
 scikit-learn==1.0.2
@@ -29,6 +29,7 @@ sbpy
 onnxruntime==1.16.3
 py4j
 terminaltables
+gatspy==0.3
 
 gcn-kafka==0.3.0
 voevent-parse==1.0.3
