@@ -12,7 +12,7 @@ pyarrow==9.0.0
 astropy
 astroquery
 fink_filters>=3.34
-git+https://github.com/astrolabsoftware/fink-science@5.15.0
+git+https://github.com/astrolabsoftware/fink-science@5.16.0
 fink-utils>=0.21.0
 fink-spins>=0.3.8
 scipy
@@ -39,6 +39,9 @@ astropy_healpix==0.7
 hdfs==2.7.2
 importlib-resources==5.9.0
 pandera==0.14.5
+
+# SSOFT
+space-rocks==1.9.8
 
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@4f46b3a1e29de45793125452974e71e92c1ea454#egg=actsnfink
