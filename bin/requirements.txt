@@ -11,9 +11,9 @@ fastavro==1.9.4
 pyarrow==9.0.0
 astropy
 astroquery
-fink_filters>=3.36
-git+https://github.com/astrolabsoftware/fink-science@5.16.0
-fink-utils>=0.23.0
+fink_filters>=3.37
+git+https://github.com/astrolabsoftware/fink-science@5.18.0
+fink-utils>=0.25.0
 fink-spins>=0.3.8
 scipy
 scikit-learn==1.0.2
@@ -46,7 +46,7 @@ space-rocks==1.9.8
 # Active learning
 -e git+https://github.com/emilleishida/fink_sn_activelearning.git@4f46b3a1e29de45793125452974e71e92c1ea454#egg=actsnfink
 -e git+https://github.com/COINtoolbox/ActSNClass.git@2c61da91a9d13834d39804fc35aeb3245ba20755#egg=actsnclass
-light-curve[full]==0.8.2
+light-curve[full]==0.9.5
 
 # microlensing
 -e git+https://github.com/JulienPeloton/LIA.git@4513654b15a0760312eff2661b0fcf4989171ce3#egg=LIA
