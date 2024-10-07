@@ -23,9 +23,6 @@ Usage:\n
 # Dependencies
 pip install --no-cache-dir -r requirements.txt
 
-# See https://github.com/astrolabsoftware/fink-science/pull/381
-pip install light-curve[full]==0.8.1
-
 # Fink-fat
 pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.1.zip
 
