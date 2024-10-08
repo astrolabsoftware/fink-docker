@@ -44,7 +44,7 @@ pandera==0.14.5
 space-rocks==1.9.8
 
 # Active learning
--e git+https://github.com/emilleishida/fink_sn_activelearning.git@4f46b3a1e29de45793125452974e71e92c1ea454#egg=actsnfink
+-e git+https://github.com/emilleishida/fink_sn_activelearning.git@cb61bbb34630c7811862050389b0f993de9639c7#egg=actsnfink
 -e git+https://github.com/COINtoolbox/ActSNClass.git@2c61da91a9d13834d39804fc35aeb3245ba20755#egg=actsnclass
 light-curve[full]==0.9.6
 
