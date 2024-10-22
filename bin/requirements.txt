@@ -13,14 +13,14 @@ astropy
 astroquery
 fink_filters>=3.37
 git+https://github.com/astrolabsoftware/fink-science@5.20.0
-fink-utils>=0.28.0
+fink-utils>=0.29.0
 fink-spins>=0.3.8
 scipy
 scikit-learn==1.0.2
 scikit-image
 joblib==1.2.0
 healpy
-fink-tns>=0.9
+fink-tns>=0.10
 tensorflow==2.15
 slack_sdk>=3.21.3
 aiohttp

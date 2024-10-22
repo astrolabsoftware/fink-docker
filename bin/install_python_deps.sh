@@ -27,7 +27,7 @@ pip install --no-cache-dir -r requirements.txt
 pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.1.zip
 
 # Fink_MM
-pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.20.1.zip
+pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.21.0.zip
 
 # Installation of torch without GPU support (lighter)
 pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
