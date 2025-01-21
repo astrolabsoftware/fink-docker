@@ -13,7 +13,7 @@ astropy
 astroquery
 fink_filters>=3.41
 git+https://github.com/astrolabsoftware/fink-science@5.22.0
-fink-utils>=0.29.16
+fink-utils>=0.29.19
 fink-spins>=0.3.8
 scipy
 scikit-learn==1.0.2
