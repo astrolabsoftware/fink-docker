@@ -43,7 +43,7 @@ Build Dockerfile image for Fink
  Use -h to display this help.
 ```
 
-where the argument to `--os` is a folder containing necessary files (copy and modify `bin` for your purposes -- see below).
+where the argument to `--os` is a folder containing necessary files (copy and modify `ztf` or `rubin` for your purposes -- see below).
 
 ### Building an image
 
@@ -52,7 +52,7 @@ To build an image from a specific Dockerfile, use:
 ```bash
 # e.g. build the prod image based on AlmaLinux 9
 # and name it prod
-./fink_docker --build --os bin --tag dev
+./fink_docker --build --os ztf --tag dev
 ```
 
 You might need to modify resolvers though. In this case, just add in `/etc/resolv.conf`
