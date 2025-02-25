@@ -21,6 +21,6 @@ Usage:\n
     \t./install_python_deps.sh \n\n
 """
 # Dependencies
-pip install --no-cache-dir -r deps/requirements.txt -r deps/requirements-science.txt
+pip install --no-cache-dir -r deps/requirements.txt -r deps/requirements-science.txt -r deps/requirements-test.txt
 
 pip install -r deps/requirements-science-no-deps.txt --no-deps
