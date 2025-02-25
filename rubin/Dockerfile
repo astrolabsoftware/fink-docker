@@ -12,10 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-ARG PYTHON_VERSION=py39_4.11.0
-ARG SPARK_VERSION=3.4.1
-ARG HBASE_VERSION=2.4.10
-ARG KAFKA_VERSION=2.8.1
+ARG PYTHON_VERSION=py311_25.1.1-2
+ARG SPARK_VERSION=3.4.3
+ARG HBASE_VERSION=2.5.8
+ARG KAFKA_VERSION=3.8.1
 ARG HADOOP_VERSION=hadoop3
 
 FROM almalinux:9 AS builder
