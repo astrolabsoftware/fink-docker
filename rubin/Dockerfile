@@ -59,7 +59,7 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION
 RUN source scripts/install_kafka.sh --version ${KAFKA_VERSION} \
 && source scripts/install_hbase.sh --version ${HBASE_VERSION} \
 && source scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} \
-&& cd $USRLIBS/bin \
+&& cd $USRLIBS/rubin \
 && pip install --no-cache-dir --upgrade pip setuptools wheel \
 && source ./install_python_deps.sh \
 && cd $USRLIBS \
