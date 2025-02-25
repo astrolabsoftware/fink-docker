@@ -24,9 +24,6 @@ seaborn
 # SNAD
 light-curve[full]==0.9.6
 
-# AGN
-iminuit==2.21.0
-
 # kilonova @ sklearn==1.0.2
 -e git+https://github.com/b-biswas/kndetect@kndetect#egg=kndetect
 
@@ -47,3 +44,7 @@ jsonschema==4.6.0
 astropy_healpix==0.7
 hdfs==2.7.2
 importlib-resources==5.9.0
+
+# SSOFT
+nifty-ls
+space-rocks==1.9.8
