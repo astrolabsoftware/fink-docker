@@ -34,7 +34,7 @@ iminuit==2.21.0
 tensorflow==2.15
 
 # Anomalies
-onnxruntime
+onnxruntime==1.16.3
 
 # fink-fat
 sbpy
