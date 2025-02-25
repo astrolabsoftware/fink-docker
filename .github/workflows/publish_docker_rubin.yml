@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Fink/Rubin Docker image
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Push Fink/Rubin Docker image to Docker Hub
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -26,14 +26,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: julienpeloton/fink-ci
+          images: julienpeloton/fink-ci-rubin
 
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
-          file: ./bin/Dockerfile
+          file: ./rubin/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
