@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019-2024 AstroLab Software
+# Copyright 2019-2025 AstroLab Software
 # Author: Julien Peloton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,19 +21,6 @@ Usage:\n
     \t./install_python_deps.sh \n\n
 """
 # Dependencies
-pip install --no-cache-dir -r requirements.txt
+pip install --no-cache-dir -r deps/requirements.txt -r requirements-science.txt
 
-# Fink-fat
-pip install --no-dependencies https://github.com/FusRoman/fink-fat/archive/v0.16.1.zip
-
-# Fink_MM
-pip install --no-dependencies https://github.com/FusRoman/Fink_MM/archive/v0.22.0.zip
-
-# Installation of torch without GPU support (lighter)
-pip install --no-cache-dir torch==1.12.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-
-# Installation of astronet
-pip install --no-dependencies git+https://github.com/tallamjr/astronet.git
-pip install george
-pip install imbalanced-learn==0.7.0
-pip install optuna==2.3.0
+pip install -r deps/requirements-science-no-deps.txt --no-deps
