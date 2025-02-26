@@ -12,6 +12,7 @@ line_profiler==4.1.3
 joblib==1.2.0
 
 # supernnova deps
+-f https://download.pytorch.org/whl/torch_stable.html
 torch==2.0.0+cpu
 h5py
 natsort
