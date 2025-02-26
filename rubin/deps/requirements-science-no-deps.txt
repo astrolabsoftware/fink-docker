@@ -1,3 +1,1 @@
-# Installation of torch without GPU support (lighter)
--f https://download.pytorch.org/whl/torch_stable.html
-torch==2.0.0+cpu
+supernnova==3.0.21
