@@ -24,3 +24,6 @@ light-curve[full]==0.9.6
 
 # CATS dependencies
 tensorflow==2.15
+
+# Orphans
+iminuit
