@@ -20,10 +20,10 @@ colorama
 seaborn
 
 # SNAD
-light-curve[full]==0.9.6
+light-curve[full]==0.10.4
 
 # CATS dependencies
 tensorflow==2.15
 
 # Orphans
-iminuit
+iminuit==2.31.1

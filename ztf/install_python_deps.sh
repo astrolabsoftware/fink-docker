@@ -24,3 +24,6 @@ Usage:\n
 pip install --no-cache-dir -r deps/requirements.txt -r deps/requirements-science.txt -r deps/requirements-test.txt
 
 pip install -r deps/requirements-science-no-deps.txt --no-deps
+
+# Dustmaps initialisation
+python -c "from dustmaps.config import config;import dustmaps.sfd;dustmaps.sfd.fetch()"
