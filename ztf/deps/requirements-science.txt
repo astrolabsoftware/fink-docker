@@ -52,3 +52,6 @@ space-rocks==1.9.8
 # Superluminous SN
 sncosmo==2.12.1
 xgboost==2.1.4
+
+# TDE
+dustmaps==1.0.14
