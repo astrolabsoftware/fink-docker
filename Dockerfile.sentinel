@@ -12,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Unified Dockerfile for Sentinel images (rubin/ztf)
+ARG input_survey=ztf
 ARG PYTHON_VERSION=py311_25.1.1-2
 ARG SPARK_VERSION=3.4.3
 ARG HBASE_VERSION=2.5.8
@@ -20,6 +23,9 @@ ARG HADOOP_VERSION=hadoop3
 
 FROM almalinux:9 AS builder
 LABEL maintainer="peloton@lal.in2p3.fr"
+
+ARG input_survey
+ENV input_survey=$input_survey
 
 ARG PYTHON_VERSION
 ENV PYTHON_VERSION=$PYTHON_VERSION
@@ -56,17 +62,20 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION
 && bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda
 
 # Install Apache Kafka, HBase and Spark. Install Python deps.
-RUN source scripts/install_kafka.sh --version ${KAFKA_VERSION} \
-&& source scripts/install_hbase.sh --version ${HBASE_VERSION} \
-&& source scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} \
-&& cd $USRLIBS/rubin \
+RUN source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} \
+&& source common/scripts/install_hbase.sh --version ${HBASE_VERSION} \
+&& source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} \
+&& cd $USRLIBS/deps/${input_survey} \
 && pip install --no-cache-dir --upgrade pip setuptools wheel \
-&& source ./install_python_deps.sh \
+&& $USRLIBS/common/scripts/install_python_deps.sh \
 && cd $USRLIBS \
 && find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
 
 # Stage 2
 FROM almalinux:9
+
+ARG input_survey
+ENV input_survey=$input_survey
 
 ARG PYTHON_VERSION
 ENV PYTHON_VERSION=$PYTHON_VERSION
@@ -105,4 +114,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash

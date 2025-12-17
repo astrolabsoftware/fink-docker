@@ -29,22 +29,21 @@ Usage: $(basename "$0") [options]
 
   Available options:
     -h                  this message
-    -t TARGET           target to build: k8s, rubin, ztf
+    -t TARGET           target to build: k8s, sentinel
     -s SUFFIX           image suffix for k8s builds: noscience, science (default: science)
-    -i SURVEY           survey for k8s builds: ztf, rubin (default: ztf)
-    --tag TAG          docker tag name (required for rubin/ztf builds)
+    -i SURVEY           survey: ztf, rubin (default: ztf)
+    --tag TAG          docker tag name (required for sentinel builds)
     --verbose           verbose build output
 
 Build Fink Docker images:
   - k8s: Build Kubernetes image using Dockerfile.k8s
-  - rubin: Build sentinel development image for Rubin survey
-  - ztf: Build sentinel development image for ZTF survey
+  - sentinel: Build sentinel development image (specify survey with -i)
 
 Examples:
-  $(basename "$0") -t k8s -s noscience -i ztf     # K8s noscience image for ZTF
-  $(basename "$0") -t k8s -s science -i rubin     # K8s science image for Rubin
-  $(basename "$0") -t rubin --tag myrubin:latest  # Sentinel Rubin image
-  $(basename "$0") -t ztf --tag myztf:latest      # Sentinel ZTF image
+  $(basename "$0") -t k8s -s noscience -i ztf       # K8s noscience image for ZTF
+  $(basename "$0") -t k8s -s science -i rubin       # K8s science image for Rubin
+  $(basename "$0") -t sentinel -i rubin --tag dev   # Sentinel Rubin image
+  $(basename "$0") -t sentinel -i ztf --tag dev     # Sentinel ZTF image
 
 EOD
 }
@@ -98,14 +97,14 @@ if [[ -z "$TARGET" ]]; then
     exit 1
 fi
 
-if [[ ! "$TARGET" =~ ^(k8s|rubin|ztf)$ ]]; then
-    echo "Error: Invalid target '$TARGET'. Must be: k8s, rubin, or ztf"
+if [[ ! "$TARGET" =~ ^(k8s|sentinel)$ ]]; then
+    echo "Error: Invalid target '$TARGET'. Must be: k8s or sentinel"
     exit 1
 fi
 
-# Validate survey for k8s builds
-if [[ "$TARGET" == "k8s" && ! "$SURVEY" =~ ^(ztf|rubin)$ ]]; then
-    echo "Error: Invalid survey '$SURVEY' for k8s build. Must be: ztf or rubin"
+# Validate survey for all builds
+if [[ ! "$SURVEY" =~ ^(ztf|rubin)$ ]]; then
+    echo "Error: Invalid survey '$SURVEY'. Must be: ztf or rubin"
     exit 1
 fi
 
@@ -115,9 +114,9 @@ if [[ "$TARGET" == "k8s" && ! "$SUFFIX" =~ ^(science|noscience)$ ]]; then
     exit 1
 fi
 
-# Require tag for local builds
-if [[ "$TARGET" =~ ^(rubin|ztf)$ && -z "$TAG" ]]; then
-    echo "Error: Tag (--tag) is required for $TARGET builds"
+# Require tag for sentinel builds
+if [[ "$TARGET" == "sentinel" && -z "$TAG" ]]; then
+    echo "Error: Tag (--tag) is required for sentinel builds"
     exit 1
 fi
 
@@ -166,22 +165,22 @@ build_k8s() {
 }
 
 build_sentinel() {
-    local survey="$1"
-    echo "Building sentinel development image for $survey survey"
+    echo "Building sentinel development image for $SURVEY survey"
 
-    if [[ ! -d "$survey" ]]; then
-        echo "Error: Directory '$survey' not found"
+    if [[ ! -f "Dockerfile.sentinel" ]]; then
+        echo "Error: Dockerfile.sentinel not found"
         exit 1
     fi
 
-    if [[ ! -f "$survey/Dockerfile" ]]; then
-        echo "Error: Dockerfile not found in '$survey' directory"
+    if [[ ! -d "deps/$SURVEY" ]]; then
+        echo "Error: Dependencies directory 'deps/$SURVEY' not found"
         exit 1
     fi
 
-    echo "Building $survey image with tag: $TAG"
+    echo "Building $SURVEY sentinel image with tag: $TAG"
     docker build $EXTRA_ARGS \
-        -f "$survey/Dockerfile" \
+        -f "Dockerfile.sentinel" \
+        --build-arg input_survey="$SURVEY" \
         -t "$TAG" \
         .
 
@@ -193,7 +192,7 @@ case "$TARGET" in
     k8s)
         build_k8s
         ;;
-    rubin|ztf)
-        build_sentinel "$TARGET"
+    sentinel)
+        build_sentinel
         ;;
 esac
