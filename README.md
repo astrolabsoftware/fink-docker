@@ -1,6 +1,16 @@
-# Dockerfile for Fink
+# Docker Images for Fink
 
-This repository contains the Dockerfile to build all-in-one image for Fink. For k8s deployment, see https://github.com/astrolabsoftware/fink-broker instead.
+This repository contains the unified Docker build system for Fink. It centralizes all image builds for both local development and Kubernetes deployment.
+
+## Architecture
+
+This repository provides:
+- **Dockerfile.k8s**: Unified Kubernetes images (replaces fink-broker/Dockerfile)
+- **rubin/Dockerfile**: Local development images for Rubin survey
+- **ztf/Dockerfile**: Local development images for ZTF survey
+- **build-images.sh**: Unified build script
+- **common/deps/**: Shared dependencies (JAR URLs)
+- Survey-specific dependencies in `rubin/deps/` and `ztf/deps/`
 
 ## Workflow
 
@@ -25,34 +35,51 @@ The code is currently checked on `Almalinux:9`.
 | HBase | 2.4.10 |
 | Kafka | 2.8.1 |
 
-The production environment is currently in use at VirtualData, Université Paris-Saclay, to process the ZTF alert stream. For development purposes, one can also build locally the image using the wrapper:
+The production environment is currently in use at VirtualData, Université Paris-Saclay, to process the ZTF alert stream. For development purposes, one can build locally images using the unified build script:
 
 ```bash
-./fink_docker -h
-Build Dockerfile image for Fink
+./build-images.sh -h
+Usage: build-images.sh [options]
 
- Usage:
- ./fink_docker [-h]
- ./fink_docker --build [--os] [--tag]
- ./fink_docker --run [--tag]
+  Available options:
+    -h                  this message
+    -t TARGET           target to build: k8s, rubin, ztf
+    -s SUFFIX           image suffix for k8s builds: noscience, science (default: science)
+    -i SURVEY           survey for k8s builds: ztf, rubin (default: ztf)
+    --tag TAG          docker tag name (required for rubin/ztf builds)
+    --verbose           verbose build output
+    --run              run the container after build (for rubin/ztf)
 
- Specify the name of a folder with a Dockerfile with the option --os.
- Use --build to build the image from the Dockerfile in --os, with a tag (--tag).
- Use --run with a tag (--tag) to enter the container instead
- For the deployment, you need to have credentials defined.
- Use -h to display this help.
+Build Fink Docker images:
+  - k8s: Build Kubernetes image using Dockerfile.k8s
+  - rubin: Build local development image for Rubin survey
+  - ztf: Build local development image for ZTF survey
+
+Examples:
+  build-images.sh -t k8s -s noscience -i ztf     # K8s noscience image for ZTF
+  build-images.sh -t k8s -s science -i rubin     # K8s science image for Rubin
+  build-images.sh -t rubin --tag myrubin:latest  # Local Rubin image
+  build-images.sh -t ztf --tag myztf:latest      # Local ZTF image
 ```
 
-where the argument to `--os` is a folder containing necessary files (copy and modify `ztf` or `rubin` for your purposes -- see below).
+This unified script replaces the previous separate build processes and supports both local development images (rubin/ztf) and Kubernetes deployment images.
 
 ### Building an image
 
-To build an image from a specific Dockerfile, use:
+To build images, use the unified build script:
 
 ```bash
-# e.g. build the prod image based on AlmaLinux 9
-# and name it prod
-./fink_docker --build --os ztf --tag dev
+# Build local development image for ZTF survey
+./build-images.sh -t ztf --tag dev
+
+# Build local development image for Rubin survey
+./build-images.sh -t rubin --tag rubin-dev
+
+# Build Kubernetes science image for ZTF
+./build-images.sh -t k8s -s science -i ztf
+
+# Build Kubernetes noscience image for Rubin
+./build-images.sh -t k8s -s noscience -i rubin
 ```
 
 You might need to modify resolvers though. In this case, just add in `/etc/resolv.conf`
@@ -90,8 +117,11 @@ Todo:
 ### Start a container
 
 ```bash
-# Enter a container based on the prod image
-./fink_docker --run --tag dev
+# Build and run a container based on the ZTF development image
+./build-images.sh -t ztf --tag dev --run
+
+# Or run an existing image
+docker run -it --rm dev bash
 ```
 
 Note that when starting a container, a script is launched to automatically start Apache HBase and Apache Kafka. Several environment variables are already defined inside the container (see each Dockerfile specifically).
@@ -117,14 +147,18 @@ d3eeb8e94cd6: Pushed
 
 ### Create your own image
 
-To create your own image with the versions you want, you would create a new folder, and copy files from an existing one (`centos7` or `centos9stream`). Then modify the values in the `ARG` in the Dockerfile. Change the base image if you wish. And then build it using:
+To create your own image with specific versions, you can:
 
-```bash
-./fink_docker --build --os <folder_name> --tag <whatever>
-```
+1. **For local development images**: Create a new folder (similar to `ztf` or `rubin`) with:
+   - A `Dockerfile`
+   - A `deps/` directory containing the requirements files
+   - Build using: `./build-images.sh -t <folder_name> --tag <whatever>`
 
-Todo:
-- [ ] Allow `--build-arg` to be used from the CLI
+2. **For K8s images**: Modify `Dockerfile.k8s` and the dependencies in `common/deps/` or specific survey deps.
+
+3. **For CI/CD**: The GitHub workflows automatically build and test images on push/PR.
+
+The unified build script now handles all build scenarios with proper argument validation.
 
 ## Image availability
 

@@ -1,0 +1,137 @@
+name: Build K8s Docker images
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      survey:
+        description: 'Survey to build for (ztf, rubin)'
+        required: true
+        default: 'ztf'
+        type: choice
+        options:
+          - ztf
+          - rubin
+      build_type:
+        description: 'Build type (science, noscience)'
+        required: true
+        default: 'science'
+        type: choice
+        options:
+          - science
+          - noscience
+
+jobs:
+  build-k8s-science:
+    name: Build K8s science images
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        survey: [ztf, rubin]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install ciux dependencies
+        run: |
+          # Install ciux if needed for K8s builds
+          # This would need to be adapted based on your ciux setup
+          echo "Setting up ciux environment..."
+          # Add your ciux installation/setup commands here
+
+      - name: Build K8s science image for ${{ matrix.survey }}
+        run: |
+          # For now, we'll use docker build directly since ciux setup is complex in CI
+          # In a real scenario, you'd want to set up the full ciux environment
+          docker build \
+            --file Dockerfile.k8s \
+            --target full \
+            --build-arg spark_py_image="astrolabsoftware/fink:spark-py-3.4.3" \
+            --build-arg input_survey="${{ matrix.survey }}" \
+            --tag "fink-k8s-${{ matrix.survey }}:science-${{ github.sha }}" \
+            .
+
+  build-k8s-noscience:
+    name: Build K8s noscience images
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        survey: [ztf, rubin]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build K8s noscience image for ${{ matrix.survey }}
+        run: |
+          docker build \
+            --file Dockerfile.k8s \
+            --target noscience \
+            --build-arg spark_py_image="astrolabsoftware/fink:spark-py-3.4.3" \
+            --build-arg input_survey="${{ matrix.survey }}" \
+            --tag "fink-k8s-${{ matrix.survey }}:noscience-${{ github.sha }}" \
+            .
+
+  build-k8s-manual:
+    name: Build K8s image (manual trigger)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build K8s ${{ github.event.inputs.build_type }} image for ${{ github.event.inputs.survey }}
+        run: |
+          TARGET="full"
+          if [[ "${{ github.event.inputs.build_type }}" == "noscience" ]]; then
+            TARGET="noscience"
+          fi
+
+          docker build \
+            --file Dockerfile.k8s \
+            --target $TARGET \
+            --build-arg spark_py_image="astrolabsoftware/fink:spark-py-3.4.3" \
+            --build-arg input_survey="${{ github.event.inputs.survey }}" \
+            --tag "fink-k8s-${{ github.event.inputs.survey }}:${{ github.event.inputs.build_type }}-${{ github.sha }}" \
+            .
+
+  test-build-script:
+    name: Test build-images.sh script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Test script help
+        run: |
+          chmod +x build-images.sh
+          ./build-images.sh -h
+
+      - name: Test script validation
+        run: |
+          # Test invalid target
+          if ./build-images.sh -t invalid; then
+            echo "ERROR: Script should fail with invalid target"
+            exit 1
+          fi
+
+          # Test missing tag for local build
+          if ./build-images.sh -t ztf; then
+            echo "ERROR: Script should fail without tag for local build"
+            exit 1
+          fi
+
+          echo "Script validation tests passed"
