@@ -1,0 +1,21 @@
+name: "build-image: platform=k8s, survey=ztf, science=false"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-ztf-noscience:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: ztf
+      suffix: noscience
+      artifact_name: k8s-ztf-noscience
+      ciux_suffix: noscience-ztf
+    secrets:
+      registry_username: ${{ secrets.REGISTRY_USERNAME }}
+      registry_token: ${{ secrets.REGISTRY_TOKEN }}

@@ -1,0 +1,106 @@
+# Copyright 2022-2024 AstroLab Software
+# Author: Julien Peloton
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Unified Dockerfile for Sentinel images (rubin/ztf)
+ARG input_survey=ztf
+
+FROM almalinux:9 AS builder
+LABEL maintainer="peloton@lal.in2p3.fr"
+
+ARG input_survey
+ENV SURVEY=$input_survey
+
+ENV FINK_BROKER_ROOT=/opt/fink-broker
+
+WORKDIR $FINK_BROKER_ROOT
+COPY containerfs/sentinel/ $FINK_BROKER_ROOT/sentinel/
+COPY containerfs/${SURVEY}/ $FINK_BROKER_ROOT/${SURVEY}/
+COPY containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
+COPY containerfs/install_miniconda.sh $FINK_BROKER_ROOT/
+
+# Define Java home path
+ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
+
+# Install system build dependencies
+RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
+&& dnf -y install lsof which git wget procps\
+&& dnf -y groupinstall "Development Tools" \
+&& dnf -y clean all \
+&& rm -rf /var/cache
+
+# Install Kafka
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
+    ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION}
+
+# Install HBase
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
+    ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION}
+
+# Install Spark
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
+    ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION}
+
+# Install miniconda
+RUN source ${FINK_BROKER_ROOT}/${SURVEY}/python_version.sh && \
+    ${FINK_BROKER_ROOT}/install_miniconda.sh --version ${PYTHON_VERSION}
+
+# Install Python dependencies and cleanup
+ENV PATH=$FINK_BROKER_ROOT/miniconda/bin:$PATH
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    HOME=${FINK_BROKER_ROOT} ${FINK_BROKER_ROOT}/install_python_deps.sh --survey ${SURVEY} --science && \
+    cd $FINK_BROKER_ROOT && \
+    find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
+
+# Stage 2
+FROM almalinux:9
+
+ARG input_survey
+ENV SURVEY=$input_survey
+
+ENV FINK_BROKER_ROOT=/opt/fink-broker
+# Redefine JAVA_HOME for the runtime stage
+ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
+
+WORKDIR $FINK_BROKER_ROOT
+
+COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
+
+# Create symbolic links for version-independent paths
+RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
+    ln -sf kafka_2.12-${KAFKA_VERSION} $FINK_BROKER_ROOT/kafka && \
+    ln -sf hbase-${HBASE_VERSION} $FINK_BROKER_ROOT/hbase && \
+    ln -sf spark-${SPARK_VERSION}-bin-${HADOOP_VERSION} $FINK_BROKER_ROOT/spark
+
+# Set environment variables using the symbolic links
+ENV KAFKA_HOME="$FINK_BROKER_ROOT/kafka"
+ENV HBASE_HOME="$FINK_BROKER_ROOT/hbase"
+ENV SPARK_HOME="$FINK_BROKER_ROOT/spark"
+
+ENV SPARKLIB="$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip"
+ENV PATH="$FINK_BROKER_ROOT/miniconda/bin:$PATH"
+ENV PATH="$HBASE_HOME/bin:$PATH"
+ENV PATH="$KAFKA_HOME/bin:$PATH"
+ENV PATH="$SPARK_HOME/bin:$SPARK_HOME/sbin:$PATH"
+ENV PYTHONPATH="$SPARKLIB"
+
+ENV BINPATH="$PATH"
+
+# Install Java and useful utilities
+RUN dnf -y update \
+&& dnf -y install which git wget java-11-openjdk \
+&& dnf -y clean all \
+&& rm -rf /var/cache
+
+CMD ["sh", "-c", "${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash"]
