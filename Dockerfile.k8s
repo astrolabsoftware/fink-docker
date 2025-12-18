@@ -18,10 +18,10 @@ ARG spark_py_image
 FROM ${spark_py_image} as noscience
 
 ARG spark_uid=185
-ENV spark_uid ${spark_uid}
+ENV spark_uid=${spark_uid}
 
 ARG input_survey
-ENV input_survey ${input_survey}
+ENV input_survey=${input_survey}
 
 # Install system-dependencies and prepare spark_uid user home directory
 USER root
@@ -35,7 +35,7 @@ ADD common/deps/jars-urls.txt $FINK_HOME/
 RUN xargs -n 1 curl --fail --output-dir /opt/spark/jars -O < $FINK_HOME/jars-urls.txt
 
 # Main process will run as spark_uid
-ENV HOME /home/fink
+ENV HOME=/home/fink
 RUN mkdir $HOME && chown ${spark_uid} $HOME
 
 # Setup for the Prometheus JMX exporter.
@@ -47,7 +47,7 @@ RUN mkdir $HOME && chown ${spark_uid} $HOME
 # 2. add the jar to the spark_py_image once dev is finished
 # Add the Prometheus JMX exporter Java agent jar for exposing metrics sent to the JmxSink to Prometheus.
 # 3. Update the version of the JMX exporter agent if needed to v1.0.1 (latest)
-ENV JMX_EXPORTER_AGENT_VERSION 1.1.0
+ENV JMX_EXPORTER_AGENT_VERSION=1.1.0
 ADD https://github.com/prometheus/jmx_exporter/releases/download/${JMX_EXPORTER_AGENT_VERSION}/jmx_prometheus_javaagent-${JMX_EXPORTER_AGENT_VERSION}.jar /opt/spark/jars
 RUN chmod 644 /opt/spark/jars/jmx_prometheus_javaagent-${JMX_EXPORTER_AGENT_VERSION}.jar
 
@@ -62,14 +62,14 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION
     && bash $HOME/miniconda.sh -b -p $HOME/miniconda
 
 ENV PATH $HOME/miniconda/bin:$PATH
-ENV FINK_HOME $HOME/fink-broker
-ENV PYTHONPATH $FINK_HOME:${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-*.zip
-ENV PATH $FINK_HOME/bin:$PATH
+ENV FINK_HOME=$HOME/fink-broker
+ENV PYTHONPATH=$FINK_HOME:${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-*.zip
+ENV PATH=$FINK_HOME/bin:$PATH
 
 RUN mkdir -p $FINK_HOME/deps
 
 # Avoid re-installing Python dependencies when fink-broker code changes
-ENV PIP_NO_CACHE_DIR 1
+ENV PIP_NO_CACHE_DIR=1
 
 # Copy all requirements files for noscience stage
 ADD ${input_survey}/deps/requirements.txt $FINK_HOME/deps/
@@ -79,7 +79,7 @@ ADD common/scripts/install_python_deps.sh $FINK_HOME/
 # Install noscience dependencies using unified script
 RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --noscience --verbose
 
-ENV FINK_ALERT_SCHEMAS_VERSION v0.0.2-rc0
+ENV FINK_ALERT_SCHEMAS_VERSION=v0.0.2-rc0
 RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse --branch "${FINK_ALERT_SCHEMAS_VERSION}" https://github.com/astrolabsoftware/fink-alert-schemas.git \
     && cd fink-alert-schemas \
     && git sparse-checkout set ztf
@@ -88,8 +88,8 @@ RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse
 # doctest requirements
 # example: python /opt/fink-broker/fink_broker/science.py
 RUN pip install py4j
-ENV FINK_JARS ""
-ENV FINK_PACKAGES ""
+ENV FINK_JARS=""
+ENV FINK_PACKAGES=""
 
 ADD --chown=${spark_uid} . $FINK_HOME/
 
