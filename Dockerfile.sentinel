@@ -65,7 +65,8 @@ WORKDIR $USRLIBS
 
 COPY --from=builder $USRLIBS $USRLIBS
 
-# Set up environment based on versions
+# Configure system environment variables for Spark, Kafka, and Python tools
+# Makes spark-submit, kafka-topics, and other binaries available in all shells
 RUN source ./versions.sentinel.sh && \
     echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
     echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
