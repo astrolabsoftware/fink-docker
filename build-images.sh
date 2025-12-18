@@ -141,13 +141,13 @@ build_k8s() {
     fi
 
     ciux ignite --selector build,k8s "$DIR" --suffix "$SUFFIX"
-    . $DIR/.ciux.d/ciux_build.sh
+    . $DIR/.ciux.d/ciux_build-k8s.sh
 
     # Determine docker target
     if [[ "$SUFFIX" =~ ^noscience* ]]; then
         docker_target="noscience"
     else
-        docker_target="full"
+        docker_target="science"
     fi
 
     # Build K8s image

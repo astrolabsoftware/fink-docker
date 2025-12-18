@@ -93,7 +93,7 @@ RUN pip install -r $FINK_HOME/deps/requirements.txt -r $FINK_HOME/deps/requireme
 
 ADD --chown=${spark_uid} . $FINK_HOME/
 
-FROM noscience AS full
+FROM noscience AS science 
 
 ADD deps/${input_survey}/requirements-science.txt $FINK_HOME/deps
 # Listing all requirements helps pip in computing a correct dependencies tree
