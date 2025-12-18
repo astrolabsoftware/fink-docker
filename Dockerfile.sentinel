@@ -1,0 +1,87 @@
+# Copyright 2022-2024 AstroLab Software
+# Author: Julien Peloton
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Unified Dockerfile for Sentinel images (rubin/ztf)
+ARG input_survey=ztf
+
+FROM almalinux:9 AS builder
+LABEL maintainer="peloton@lal.in2p3.fr"
+
+ARG input_survey
+ENV input_survey=$input_survey
+
+ENV USRLIBS /opt/fink-broker
+
+WORKDIR $USRLIBS
+COPY . .
+COPY homefs/common/ ./common/
+COPY homefs/${input_survey}/ ./${input_survey}/
+COPY ${input_survey}/versions.sentinel.sh ./versions.sentinel.sh
+
+# Install system build dependencies
+RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
+&& dnf -y install lsof which git wget procps\
+&& dnf -y groupinstall "Development Tools" \
+&& dnf -y clean all \
+&& rm -rf /var/cache \
+&& echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
+
+ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
+
+# Install python, Kafka, HBase and Spark with sourced versions
+RUN source ./versions.sentinel.sh && \
+    source ./${input_survey}/python_version.sh && \
+    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
+    source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
+    source common/scripts/install_hbase.sh --version ${HBASE_VERSION} && \
+    source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    HOME=${USRLIBS} $USRLIBS/common/scripts/install_python_deps.sh --survey ${input_survey} --science && \
+    cd $USRLIBS && \
+    find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
+
+# Stage 2
+FROM almalinux:9
+
+ARG input_survey
+ENV input_survey=$input_survey
+
+ENV USRLIBS /home/libs
+
+WORKDIR $USRLIBS
+
+COPY --from=builder $USRLIBS $USRLIBS
+
+# Configure system environment variables for Spark, Kafka, and Python tools
+# Makes spark-submit, kafka-topics, and other binaries available in all shells
+RUN source ./versions.sentinel.sh && \
+    echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
+    echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
+    echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
+    echo "export PATH=${USRLIBS}/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
+    echo "export BINPATH=\${PATH}" >> /etc/environment && \
+    echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/environment
+
+# Install Java and useful utilities
+RUN dnf -y update \
+&& dnf -y install which git wget java-11-openjdk \
+&& dnf -y clean all \
+&& rm -rf /var/cache \
+&& echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
+
+ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
+
+ENTRYPOINT source ./versions.sentinel.sh && source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash

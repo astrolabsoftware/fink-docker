@@ -1,0 +1,21 @@
+name: "Build K8s Rubin NoScience image"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-rubin-noscience:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: rubin
+      suffix: noscience
+      artifact_name: k8s-rubin-noscience
+      ciux_suffix: noscience-rubin
+    secrets:
+      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}

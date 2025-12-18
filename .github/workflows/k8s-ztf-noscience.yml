@@ -1,0 +1,21 @@
+name: "Build K8s ZTF NoScience image"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-ztf-noscience:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: ztf
+      suffix: noscience
+      artifact_name: k8s-ztf-noscience
+      ciux_suffix: noscience-ztf
+    secrets:
+      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}

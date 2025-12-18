@@ -1,0 +1,21 @@
+name: "Build K8s Rubin Science image"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-rubin-science:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: rubin
+      suffix: science
+      artifact_name: k8s-rubin-science
+      ciux_suffix: science-rubin
+    secrets:
+      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
