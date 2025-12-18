@@ -31,9 +31,9 @@ RUN apt-get update && \
     rm -rf /var/cache/apt/*
 
 # Download and install Spark dependencies listed in jars-urls.txt
-# (jars-urls.txt will be copied to /opt/fink-broker/common/deps/ via homefs/ ADD below)
+# (jars-urls.txt will be copied to /opt/fink-broker/common/deps/ via containerfs/ ADD below)
 RUN mkdir -p /opt/fink-broker/common/deps
-ADD homefs/common/deps/jars-urls.txt /opt/fink-broker/common/deps/
+ADD containerfs/common/deps/jars-urls.txt /opt/fink-broker/common/deps/
 RUN xargs -n 1 curl --fail --output-dir /opt/spark/jars -O < /opt/fink-broker/common/deps/jars-urls.txt
 
 # Main process will run as spark_uid
@@ -58,8 +58,8 @@ USER ${spark_uid}
 WORKDIR $HOME
 
 # Copy survey-specific files and common scripts
-ADD --chown=${spark_uid} homefs/common/ $HOME/common/
-ADD --chown=${spark_uid} homefs/${input_survey}/ $HOME/${input_survey}/
+ADD --chown=${spark_uid} containerfs/common/ $HOME/common/
+ADD --chown=${spark_uid} containerfs/${input_survey}/ $HOME/${input_survey}/
 
 # Install python using survey-specific version
 RUN source $HOME/${input_survey}/python_version.sh && \
