@@ -31,7 +31,7 @@ RUN apt-get update && \
     rm -rf /var/cache/apt/*
 
 # Download and install Spark dependencies listed in jars-urls.txt
-ADD common/deps/jars-urls.txt $FINK_HOME/
+ADD homefs/common/deps/jars-urls.txt $FINK_HOME/
 RUN xargs -n 1 curl --fail --output-dir /opt/spark/jars -O < $FINK_HOME/jars-urls.txt
 
 # Main process will run as spark_uid
