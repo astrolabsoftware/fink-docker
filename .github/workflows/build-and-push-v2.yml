@@ -1,0 +1,263 @@
+name: "Build, scan and push Fink Docker images (Parallel)"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CIUX_VERSION: v0.0.7-rc1
+  REGISTRY: gitlab-registry.in2p3.fr
+
+# Template job definition to avoid repetition
+# Each image gets its own independent build → scan → push pipeline
+jobs:
+  # K8s ZTF Science
+  build-k8s-ztf-science:
+    name: "K8s ZTF Science - Build"
+    runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.build.outcome == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install ciux
+        run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
+      - name: Build image
+        id: build
+        run: |
+          mkdir -p $HOME/.ciux artifacts
+          echo "Building K8s ZTF science image..."
+          ./build-images.sh -t k8s -i ztf -s science --verbose
+
+          # Export image
+          $(ciux get image --check $PWD --suffix "science-ztf" --env)
+          if [ $CIUX_BUILD = true ]; then
+            docker save "$CIUX_IMAGE_URL" > artifacts/k8s-ztf-science.tar
+          else
+            touch artifacts/k8s-ztf-science.empty
+          fi
+          echo "image-url=$CIUX_IMAGE_URL" >> "$GITHUB_OUTPUT"
+          echo "new-build=$CIUX_BUILD" >> "$GITHUB_OUTPUT"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s-ztf-science
+          path: artifacts
+
+  scan-k8s-ztf-science:
+    name: "K8s ZTF Science - Scan"
+    runs-on: ubuntu-latest
+    needs: build-k8s-ztf-science
+    if: always() && needs.build-k8s-ztf-science.outputs.success == 'true'
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: k8s-ztf-science
+          path: artifacts
+      - name: Security scan
+        run: |
+          if [ -f artifacts/k8s-ztf-science.tar ]; then
+            docker load --input artifacts/k8s-ztf-science.tar
+            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
+            # Run Trivy scan
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              -v $PWD:/tmp/output aquasec/trivy:latest image \
+              --format sarif --output /tmp/output/trivy-results.sarif \
+              "$IMAGE_NAME"
+          else
+            echo '{"version":"2.1.0","runs":[]}' > trivy-results.sarif
+          fi
+      - name: Upload scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  push-k8s-ztf-science:
+    name: "K8s ZTF Science - Push"
+    runs-on: ubuntu-latest
+    needs: [build-k8s-ztf-science, scan-k8s-ztf-science]
+    if: |
+      always() &&
+      needs.build-k8s-ztf-science.outputs.success == 'true' &&
+      (needs.scan-k8s-ztf-science.result == 'success' || needs.scan-k8s-ztf-science.result == 'skipped') &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install ciux
+        run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: k8s-ztf-science
+          path: artifacts
+      - name: Login to GitLab Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          password: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+      - name: Push image
+        run: |
+          $(ciux get image --check $PWD --suffix "science-ztf" --env)
+          if [ -f artifacts/k8s-ztf-science.tar ]; then
+            echo "Loading and pushing new image: $CIUX_IMAGE_URL"
+            docker load --input artifacts/k8s-ztf-science.tar
+            docker push "$CIUX_IMAGE_URL"
+          else
+            echo "No new image to push"
+          fi
+
+  # K8s ZTF NoScience
+  build-k8s-ztf-noscience:
+    name: "K8s ZTF NoScience - Build"
+    runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.build.outcome == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install ciux
+        run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
+      - name: Build image
+        id: build
+        run: |
+          mkdir -p $HOME/.ciux artifacts
+          echo "Building K8s ZTF noscience image..."
+          ./build-images.sh -t k8s -i ztf -s noscience --verbose
+
+          # Export image
+          $(ciux get image --check $PWD --suffix "noscience-ztf" --env)
+          if [ $CIUX_BUILD = true ]; then
+            docker save "$CIUX_IMAGE_URL" > artifacts/k8s-ztf-noscience.tar
+          else
+            touch artifacts/k8s-ztf-noscience.empty
+          fi
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s-ztf-noscience
+          path: artifacts
+
+  scan-k8s-ztf-noscience:
+    name: "K8s ZTF NoScience - Scan"
+    runs-on: ubuntu-latest
+    needs: build-k8s-ztf-noscience
+    if: always() && needs.build-k8s-ztf-noscience.outputs.success == 'true'
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: k8s-ztf-noscience
+          path: artifacts
+      - name: Security scan
+        run: |
+          if [ -f artifacts/k8s-ztf-noscience.tar ]; then
+            docker load --input artifacts/k8s-ztf-noscience.tar
+            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              -v $PWD:/tmp/output aquasec/trivy:latest image \
+              --format sarif --output /tmp/output/trivy-results.sarif \
+              "$IMAGE_NAME"
+          else
+            echo '{"version":"2.1.0","runs":[]}' > trivy-results.sarif
+          fi
+      - name: Upload scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  push-k8s-ztf-noscience:
+    name: "K8s ZTF NoScience - Push"
+    runs-on: ubuntu-latest
+    needs: [build-k8s-ztf-noscience, scan-k8s-ztf-noscience]
+    if: |
+      always() &&
+      needs.build-k8s-ztf-noscience.outputs.success == 'true' &&
+      (needs.scan-k8s-ztf-noscience.result == 'success' || needs.scan-k8s-ztf-noscience.result == 'skipped') &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install ciux
+        run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: k8s-ztf-noscience
+          path: artifacts
+      - name: Login to GitLab Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          password: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+      - name: Push image
+        run: |
+          $(ciux get image --check $PWD --suffix "noscience-ztf" --env)
+          if [ -f artifacts/k8s-ztf-noscience.tar ]; then
+            echo "Loading and pushing new image: $CIUX_IMAGE_URL"
+            docker load --input artifacts/k8s-ztf-noscience.tar
+            docker push "$CIUX_IMAGE_URL"
+          else
+            echo "No new image to push"
+          fi
+
+  # Summary job to provide overall status
+  summary:
+    name: "Build Summary"
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build-k8s-ztf-science, build-k8s-ztf-noscience]
+    steps:
+      - name: Summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | Build | Scan | Push |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| K8s ZTF Science | ${{ needs.build-k8s-ztf-science.result }} | ${{ needs.scan-k8s-ztf-science.result || 'N/A' }} | ${{ needs.push-k8s-ztf-science.result || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| K8s ZTF NoScience | ${{ needs.build-k8s-ztf-noscience.result }} | ${{ needs.scan-k8s-ztf-noscience.result || 'N/A' }} | ${{ needs.push-k8s-ztf-noscience.result || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
+
+          # Set overall status
+          if [[ "${{ needs.build-k8s-ztf-science.result }}" == "failure" || "${{ needs.build-k8s-ztf-noscience.result }}" == "failure" ]]; then
+            echo "❌ Some builds failed"
+            exit 1
+          else
+            echo "✅ All builds completed"
+          fi
