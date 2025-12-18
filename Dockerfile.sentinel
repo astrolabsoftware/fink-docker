@@ -25,8 +25,8 @@ ENV input_survey=$input_survey
 ENV USRLIBS /opt/fink-broker
 
 WORKDIR $USRLIBS
-COPY containerfs/common/ ./common/
-COPY containerfs/${input_survey}/ ./${input_survey}/
+COPY containerfs/common/ $USRLIBS/common/
+COPY containerfs/${input_survey}/ $USRLIBS/${input_survey}/
 
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
