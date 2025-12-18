@@ -47,7 +47,7 @@ RUN source ./versions.sentinel.sh && \
     source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
     cd $USRLIBS/${input_survey}/deps && \
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    $USRLIBS/common/scripts/install_python_deps.sh && \
+    $USRLIBS/common/scripts/install_python_deps.sh ${input_survey} && \
     cd $USRLIBS && \
     find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
 
