@@ -17,20 +17,54 @@
 set -e
 
 message_help="""
-Install Python dependencies for fink-broker through pip\n\n
-Usage:\n
-    \t./install_python_deps.sh [SURVEY]\n\n
-SURVEY: rubin or ztf (auto-detected from current directory if not specified)
+Install Python dependencies for fink-broker through pip
+
+Usage:
+    ./install_python_deps.sh [OPTIONS]
+
+OPTIONS:
+    -s, --survey SURVEY     Survey: rubin or ztf (auto-detected from current directory if not specified)
+    --science              Install all dependencies including science packages (default)
+    --noscience            Install only base and test dependencies
+    -h, --help             Show this help message
+
+Examples:
+    ./install_python_deps.sh --survey ztf --science
+    ./install_python_deps.sh -s rubin --noscience
 """
 
-# Auto-detect survey from current directory or use parameter
-if [[ $# -eq 0 ]]; then
-    SURVEY=$(basename "$PWD")
-else
-    SURVEY=$1
-fi
+# Default values
+SURVEY=$(basename "$PWD")
+MODE="science"
 
-echo "Installing Python dependencies for survey: $SURVEY"
+# Parse command line options
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -s|--survey)
+            SURVEY="$2"
+            shift 2
+            ;;
+        --science)
+            MODE="science"
+            shift
+            ;;
+        --noscience)
+            MODE="noscience"
+            shift
+            ;;
+        -h|--help)
+            echo -e "$message_help"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo -e "$message_help"
+            exit 1
+            ;;
+    esac
+done
+
+echo "Installing Python dependencies for survey: $SURVEY, mode: $MODE"
 
 # Validate survey
 if [[ ! "$SURVEY" =~ ^(rubin|ztf)$ ]]; then
@@ -39,17 +73,33 @@ if [[ ! "$SURVEY" =~ ^(rubin|ztf)$ ]]; then
     exit 1
 fi
 
-# Install dependencies
+# Install base dependencies (always installed)
 echo "Installing base requirements..."
-pip install --no-cache-dir -r requirements.txt -r requirements-science.txt -r requirements-test.txt
+pip install --no-cache-dir --upgrade pip setuptools wheel
+pip install --no-cache-dir -r requirements.txt
 
-echo "Installing science dependencies without deps..."
-pip install -r requirements-science-no-deps.txt --no-deps
-
-# ZTF-specific: dustmaps initialization
-if [[ "$SURVEY" == "ztf" ]]; then
-    echo "Initializing dustmaps for ZTF..."
-    python -c "from dustmaps.config import config;import dustmaps.sfd;dustmaps.sfd.fetch()"
+# Install test dependencies for noscience mode
+if [[ "$MODE" == "noscience" ]]; then
+    echo "Installing test requirements..."
+    pip install -r requirements-test.txt
 fi
 
-echo "Python dependencies installation completed for $SURVEY"
+# Install science dependencies for science mode
+if [[ "$MODE" == "science" ]]; then
+    echo "Installing test requirements..."
+    pip install -r requirements-test.txt
+
+    echo "Installing science requirements..."
+    pip install -r requirements-science.txt --use-pep517
+
+    echo "Installing science dependencies without deps..."
+    pip install -r requirements-science-no-deps.txt --no-deps
+
+    # ZTF-specific: dustmaps initialization
+    if [[ "$SURVEY" == "ztf" ]]; then
+        echo "Initializing dustmaps for ZTF..."
+        python -c "from dustmaps.config import config;import dustmaps.sfd;dustmaps.sfd.fetch()"
+    fi
+fi
+
+echo "Python dependencies installation completed for $SURVEY (mode: $MODE)"

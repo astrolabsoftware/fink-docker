@@ -68,11 +68,16 @@ ENV PATH $FINK_HOME/bin:$PATH
 
 RUN mkdir -p $FINK_HOME/deps
 
-# Avoid re-installing Python dependencies
-# when fink-broker code changes
+# Avoid re-installing Python dependencies when fink-broker code changes
 ENV PIP_NO_CACHE_DIR 1
-ADD ${input_survey}/deps/requirements.txt $FINK_HOME/deps
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && pip install -r $FINK_HOME/deps/requirements.txt
+
+# Copy all requirements files for noscience stage
+ADD ${input_survey}/deps/requirements.txt $FINK_HOME/deps/
+ADD ${input_survey}/deps/requirements-test.txt $FINK_HOME/deps/
+ADD common/scripts/install_python_deps.sh $FINK_HOME/
+
+# Install noscience dependencies using unified script
+RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --noscience
 
 ENV FINK_ALERT_SCHEMAS_VERSION v0.0.2-rc0
 RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse --branch "${FINK_ALERT_SCHEMAS_VERSION}" https://github.com/astrolabsoftware/fink-alert-schemas.git \
@@ -85,21 +90,14 @@ RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse
 RUN pip install py4j
 ENV FINK_JARS ""
 ENV FINK_PACKAGES ""
-# pytest requirements
-ADD ${input_survey}/deps/requirements-test.txt $FINK_HOME/deps
-# Listing all requirements helps pip in computing a correct dependencies tree
-# See additional explanation in https://github.com/astrolabsoftware/fink-broker/issues/865
-RUN pip install -r $FINK_HOME/deps/requirements.txt -r $FINK_HOME/deps/requirements-test.txt
 
 ADD --chown=${spark_uid} . $FINK_HOME/
 
-FROM noscience AS science 
+FROM noscience AS science
 
-ADD ${input_survey}/deps/requirements-science.txt $FINK_HOME/deps
-# Listing all requirements helps pip in computing a correct dependencies tree
-RUN pip install -r $FINK_HOME/deps/requirements.txt -r $FINK_HOME/deps/requirements-test.txt -r $FINK_HOME/deps/requirements-science.txt --use-pep517
-ADD ${input_survey}/deps/requirements-science-no-deps.txt $FINK_HOME/deps
-RUN pip install -r $FINK_HOME/deps/requirements-science-no-deps.txt --no-deps
+# Copy additional requirements files for science stage
+ADD ${input_survey}/deps/requirements-science.txt $FINK_HOME/deps/
+ADD ${input_survey}/deps/requirements-science-no-deps.txt $FINK_HOME/deps/
 
-# Finally initialise dustmaps
-RUN python -c "from dustmaps.config import config;import dustmaps.sfd;dustmaps.sfd.fetch()"
+# Install science dependencies using unified script
+RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --science
