@@ -48,6 +48,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Maximize build space
+        run: |
+          echo "Removing unwanted software... "
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          df -h
+          sudo rm -rf /usr/local/lib/android
+          df -h
+          sudo rm -rf /opt/ghc
+          df -h
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          df -h
+          docker image prune --all --force
+          df -h
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
