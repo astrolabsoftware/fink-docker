@@ -44,9 +44,9 @@ RUN source /opt/fink-broker/${input_survey}/versions.sentinel.sh && \
     source /opt/fink-broker/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
     bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
-    source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
-    source common/scripts/install_hbase.sh --version ${HBASE_VERSION} && \
-    source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
+    source /opt/fink-broker/common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
+    source /opt/fink-broker/common/scripts/install_hbase.sh --version ${HBASE_VERSION} && \
+    source /opt/fink-broker/common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
     HOME=${USRLIBS} $USRLIBS/common/scripts/install_python_deps.sh --survey ${input_survey} --science && \
     cd $USRLIBS && \
@@ -83,4 +83,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source /opt/fink-broker/${input_survey}/versions.sentinel.sh && source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT source /opt/fink-broker/${input_survey}/versions.sentinel.sh && source /opt/fink-broker/common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
