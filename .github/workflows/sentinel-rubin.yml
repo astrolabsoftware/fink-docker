@@ -1,0 +1,21 @@
+name: "Build Sentinel Rubin image"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sentinel-rubin:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: sentinel
+      survey: rubin
+      suffix: ""
+      artifact_name: sentinel-rubin
+      ciux_suffix: sentinel-rubin
+    secrets:
+      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}

@@ -1,0 +1,21 @@
+name: "Build K8s ZTF Science image"
+
+on:
+  push:
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-ztf-science:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: ztf
+      suffix: science
+      artifact_name: k8s-ztf-science
+      ciux_suffix: science-ztf
+    secrets:
+      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
