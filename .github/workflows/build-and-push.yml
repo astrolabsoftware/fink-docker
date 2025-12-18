@@ -38,8 +38,6 @@ jobs:
           - target: sentinel
             survey: rubin
             suffix: ""
-    outputs:
-      image-${{ matrix.target }}-${{ matrix.survey }}-${{ matrix.suffix }}: ${{ steps.export.outputs.IMAGE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -127,25 +125,24 @@ jobs:
           name: docker-artifact-${{ matrix.target }}-${{ matrix.survey }}-${{ matrix.suffix }}
           path: artifacts
 
-      - name: Load image in local registry
+      - name: Load image and run security scan
         run: |
           if [ -f artifacts/image-${{ matrix.target }}-${{ matrix.survey }}-${{ matrix.suffix }}.tar ]; then
             echo "Loading image from archive"
             docker load --input artifacts/image-${{ matrix.target }}-${{ matrix.survey }}-${{ matrix.suffix }}.tar
-            IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -v "REPOSITORY" | head -1)
-          else
-            echo "Using existing image (no new build needed)"
-            # Get image name from build job output (this would need to be passed properly)
-            IMAGE_NAME="placeholder-image"
-          fi
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
+            echo "Scanning image: $IMAGE_NAME"
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+            # Run Trivy scan
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              -v $PWD:/tmp/trivy aquasec/trivy:latest image \
+              --format sarif --output /tmp/trivy/trivy-results.sarif \
+              "$IMAGE_NAME"
+          else
+            echo "No new image to scan (using existing image)"
+            # Create empty SARIF for consistency
+            echo '{"version":"2.1.0","runs":[]}' > trivy-results.sarif
+          fi
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
