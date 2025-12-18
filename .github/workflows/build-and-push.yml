@@ -52,13 +52,25 @@ jobs:
       - name: Install ciux
         run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
 
+      - name: Debug environment
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Available files:"
+          ls -la
+          echo "CIUX version: $(ciux version || echo 'ciux not found')"
+          echo "Docker version: $(docker version --format '{{.Client.Version}}')"
+
       - name: Build ${{ matrix.target }} image for ${{ matrix.survey }}${{ matrix.suffix && format(' ({0})', matrix.suffix) || '' }}
         run: |
           mkdir -p $HOME/.ciux
+          echo "Building ${{ matrix.target }} image for ${{ matrix.survey }}${{ matrix.suffix }}"
+
           if [ "${{ matrix.target }}" = "k8s" ]; then
-            ./build-images.sh -t k8s -i ${{ matrix.survey }} -s ${{ matrix.suffix }}
+            echo "Running K8s build..."
+            ./build-images.sh -t k8s -i ${{ matrix.survey }} -s ${{ matrix.suffix }} --verbose
           else
-            ./build-images.sh -t sentinel -i ${{ matrix.survey }}
+            echo "Running Sentinel build..."
+            ./build-images.sh -t sentinel -i ${{ matrix.survey }} --verbose
           fi
 
       - name: Export image information
