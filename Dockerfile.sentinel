@@ -58,19 +58,19 @@ FROM almalinux:9
 ARG input_survey
 ENV input_survey=$input_survey
 
-ENV USRLIBS /home/libs
+ENV FINK_BROKER_ROOT /opt/fink-broker
 
-WORKDIR $USRLIBS
+WORKDIR $FINK_BROKER_ROOT
 
-COPY --from=builder $FINK_BROKER_ROOT $USRLIBS
+COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
-RUN source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && \
-    echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
-    echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
+RUN source $FINK_BROKER_ROOT/${input_survey}/versions.sentinel.sh && \
+    echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
+    echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/environment && \
     echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
-    echo "export PATH=$USRLIBS/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
+    echo "export PATH=$FINK_BROKER_ROOT/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
     echo "export BINPATH=\${PATH}" >> /etc/environment && \
     echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/environment
 

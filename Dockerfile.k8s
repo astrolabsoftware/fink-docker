@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 ARG spark_py_image
-FROM ${spark_py_image} as noscience
+FROM ${spark_py_image} AS noscience
 
 ARG spark_uid=185
 ENV spark_uid=${spark_uid}
@@ -67,7 +67,7 @@ RUN source $FINK_BROKER_ROOT/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O $HOME/miniconda.sh && \
     bash $HOME/miniconda.sh -b -p $HOME/miniconda
 
-ENV PATH $HOME/miniconda/bin:$PATH
+ENV PATH=$HOME/miniconda/bin:$PATH
 ENV FINK_HOME=$HOME
 ENV PYTHONPATH=$FINK_HOME:${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-*.zip
 ENV PATH=$FINK_HOME/bin:$PATH
