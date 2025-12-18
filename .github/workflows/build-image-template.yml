@@ -64,7 +64,11 @@ jobs:
 
           # Build based on target
           if [ "${{ inputs.target }}" = "k8s" ]; then
-            ./build-images.sh -t k8s -i ${{ inputs.survey }} -s ${{ inputs.suffix }} --verbose
+            if [ -n "${{ inputs.suffix }}" ]; then
+              ./build-images.sh -t k8s -i ${{ inputs.survey }} -s ${{ inputs.suffix }} --verbose
+            else
+              ./build-images.sh -t k8s -i ${{ inputs.survey }} --verbose
+            fi
           else
             ./build-images.sh -t sentinel -i ${{ inputs.survey }} --verbose
           fi
