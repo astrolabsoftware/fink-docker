@@ -26,16 +26,18 @@ OPTIONS:
     -s, --survey SURVEY     Survey: rubin or ztf (auto-detected from current directory if not specified)
     --science              Install all dependencies including science packages (default)
     --noscience            Install only base and test dependencies
+    -v, --verbose          Enable verbose output for debugging
     -h, --help             Show this help message
 
 Examples:
     ./install_python_deps.sh --survey ztf --science
-    ./install_python_deps.sh -s rubin --noscience
+    ./install_python_deps.sh -s rubin --noscience --verbose
 """
 
 # Default values
 SURVEY=$(basename "$PWD")
 MODE="science"
+VERBOSE=false
 
 # Parse command line options
 while [[ $# -gt 0 ]]; do
@@ -52,6 +54,10 @@ while [[ $# -gt 0 ]]; do
             MODE="noscience"
             shift
             ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
         -h|--help)
             echo -e "$message_help"
             exit 0
@@ -64,7 +70,29 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Enable verbose output if requested
+if [[ "$VERBOSE" == true ]]; then
+    set -x
+fi
+
 echo "Installing Python dependencies for survey: $SURVEY, mode: $MODE"
+
+# Debug information in verbose mode
+if [[ "$VERBOSE" == true ]]; then
+    echo "DEBUG: Current working directory: $(pwd)"
+    echo "DEBUG: Available files:"
+    ls -la
+    echo "DEBUG: Python version: $(python --version 2>&1 || echo 'Python not found')"
+    echo "DEBUG: Pip version: $(pip --version 2>&1 || echo 'Pip not found')"
+    echo "DEBUG: Requirements files:"
+    for f in requirements*.txt; do
+        if [[ -f "$f" ]]; then
+            echo "  - $f ($(wc -l < "$f") lines)"
+        else
+            echo "  - $f (not found)"
+        fi
+    done
+fi
 
 # Validate survey
 if [[ ! "$SURVEY" =~ ^(rubin|ztf)$ ]]; then

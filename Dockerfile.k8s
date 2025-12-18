@@ -77,7 +77,7 @@ ADD ${input_survey}/deps/requirements-test.txt $FINK_HOME/deps/
 ADD common/scripts/install_python_deps.sh $FINK_HOME/
 
 # Install noscience dependencies using unified script
-RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --noscience
+RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --noscience --verbose
 
 ENV FINK_ALERT_SCHEMAS_VERSION v0.0.2-rc0
 RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse --branch "${FINK_ALERT_SCHEMAS_VERSION}" https://github.com/astrolabsoftware/fink-alert-schemas.git \
@@ -100,4 +100,4 @@ ADD ${input_survey}/deps/requirements-science.txt $FINK_HOME/deps/
 ADD ${input_survey}/deps/requirements-science-no-deps.txt $FINK_HOME/deps/
 
 # Install science dependencies using unified script
-RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --science
+RUN cd $FINK_HOME/deps && $FINK_HOME/install_python_deps.sh --survey ${input_survey} --science --verbose
