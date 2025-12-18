@@ -32,7 +32,6 @@ Usage: $(basename "$0") [options]
     -t TARGET           target to build: k8s, sentinel
     -s SUFFIX           image suffix for k8s builds: noscience, science (default: science)
     -i SURVEY           survey: ztf, rubin (default: ztf)
-    --tag TAG          docker tag name (required for sentinel builds)
     --verbose           verbose build output
 
 Build Fink Docker images:
@@ -42,8 +41,8 @@ Build Fink Docker images:
 Examples:
   $(basename "$0") -t k8s -s noscience -i ztf       # K8s noscience image for ZTF
   $(basename "$0") -t k8s -s science -i rubin       # K8s science image for Rubin
-  $(basename "$0") -t sentinel -i rubin --tag dev   # Sentinel Rubin image
-  $(basename "$0") -t sentinel -i ztf --tag dev     # Sentinel ZTF image
+  $(basename "$0") -t sentinel -i rubin   # Sentinel Rubin image
+  $(basename "$0") -t sentinel -i ztf    # Sentinel ZTF image
 
 EOD
 }
@@ -52,7 +51,6 @@ EOD
 TARGET=""
 SUFFIX="science"
 SURVEY="ztf"
-TAG=""
 VERBOSE=false
 
 # Parse arguments
@@ -72,10 +70,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         -i|--survey)
             SURVEY="$2"
-            shift 2
-            ;;
-        --tag)
-            TAG="$2"
             shift 2
             ;;
         --verbose)
@@ -130,13 +124,12 @@ fi
 build_k8s() {
     echo "Building K8s image for $SURVEY survey with $SUFFIX target"
 
-    # This command avoid retrieving build dependencies if not needed
+    # This command avoid building if not needed
+    SUFFIX="$SUFFIX-$SURVEY"
     $(ciux get image --check "$DIR" --suffix "$SUFFIX" --env)
 
     if [ "$CIUX_BUILD" = false ]; then
         echo "Build cancelled, image $CIUX_IMAGE_URL already exists and contains current source code"
-        echo "Run following command to prepare integration tests:"
-        echo "  ciux ignite --selector build,k8s \"$DIR\" --suffix \"$SUFFIX\""
         exit 0
     fi
 
@@ -155,33 +148,30 @@ build_k8s() {
         --tag "$CIUX_IMAGE_URL" \
         --build-arg spark_py_image="$ASTROLABSOFTWARE_FINK_SPARK_PY_IMAGE" \
         --build-arg input_survey="$SURVEY" \
-        --file Dockerfile.k8s \
+        --file "$DIR/Dockerfile.k8s" \
         --target "$docker_target" \
         "$DIR"
 
     echo "Build successful: $CIUX_IMAGE_URL"
-    echo "Run following command to prepare integration tests:"
-    echo "  ciux ignite --selector ci \"$DIR\" --suffix \"$SUFFIX\""
 }
 
 build_sentinel() {
     echo "Building sentinel development image for $SURVEY survey"
 
-    if [[ ! -f "Dockerfile.sentinel" ]]; then
-        echo "Error: Dockerfile.sentinel not found"
-        exit 1
-    fi
+    SUFFIX="sentinel-$SURVEY"
+    # This command avoid building if not needed
+    $(ciux get image --check "$DIR" --suffix "$SUFFIX" --env)
 
-    if [[ ! -d "deps/$SURVEY" ]]; then
-        echo "Error: Dependencies directory 'deps/$SURVEY' not found"
-        exit 1
+    if [ "$CIUX_BUILD" = false ]; then
+        echo "Build cancelled, image $CIUX_IMAGE_URL already exists and contains current source code"
+        exit 0
     fi
 
     echo "Building $SURVEY sentinel image with tag: $TAG"
     docker build $EXTRA_ARGS \
-        -f "Dockerfile.sentinel" \
+        --tag "$CIUX_IMAGE_URL" \
+        -f "$DIR/Dockerfile.sentinel" \
         --build-arg input_survey="$SURVEY" \
-        -t "$TAG" \
         .
 
     echo "Build successful: $TAG"
