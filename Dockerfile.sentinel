@@ -40,8 +40,8 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
 
 # Install python, Kafka, HBase and Spark with sourced versions
-RUN source ./${input_survey}/versions.sentinel.sh && \
-    source ./${input_survey}/python_version.sh && \
+RUN source /opt/fink-broker/${input_survey}/versions.sentinel.sh && \
+    source /opt/fink-broker/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
     bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
     source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
@@ -66,7 +66,7 @@ COPY --from=builder $USRLIBS $USRLIBS
 
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
-RUN source ./${input_survey}/versions.sentinel.sh && \
+RUN source /opt/fink-broker/${input_survey}/versions.sentinel.sh && \
     echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
     echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
     echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
@@ -83,4 +83,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source ./${input_survey}/versions.sentinel.sh && source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT source /opt/fink-broker/${input_survey}/versions.sentinel.sh && source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
