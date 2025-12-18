@@ -35,8 +35,8 @@ ADD common/deps/jars-urls.txt $FINK_HOME/
 RUN xargs -n 1 curl --fail --output-dir /opt/spark/jars -O < $FINK_HOME/jars-urls.txt
 
 # Main process will run as spark_uid
-ENV HOME=/home/fink
-RUN mkdir $HOME && chown ${spark_uid} $HOME
+ENV HOME=/opt/fink-broker
+RUN mkdir -p $HOME && chown ${spark_uid} $HOME
 
 # Setup for the Prometheus JMX exporter.
 # TODO:
@@ -55,8 +55,9 @@ USER ${spark_uid}
 
 WORKDIR $HOME
 
-# Copy all homefs content to container
-ADD --chown=${spark_uid} homefs/ $HOME/
+# Copy survey-specific files and common scripts
+ADD --chown=${spark_uid} homefs/common/ $HOME/common/
+ADD --chown=${spark_uid} homefs/${input_survey}/ $HOME/${input_survey}/
 
 # Install python using survey-specific version
 RUN source $HOME/${input_survey}/python_version.sh && \
@@ -64,7 +65,7 @@ RUN source $HOME/${input_survey}/python_version.sh && \
     bash $HOME/miniconda.sh -b -p $HOME/miniconda
 
 ENV PATH $HOME/miniconda/bin:$PATH
-ENV FINK_HOME=$HOME/fink-broker
+ENV FINK_HOME=$HOME
 ENV PYTHONPATH=$FINK_HOME:${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-*.zip
 ENV PATH=$FINK_HOME/bin:$PATH
 
