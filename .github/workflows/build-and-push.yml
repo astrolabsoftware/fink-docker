@@ -12,32 +12,10 @@ env:
   REGISTRY: gitlab-registry.in2p3.fr
 
 jobs:
-  build-matrix:
-    name: Build ${{ matrix.target }} - ${{ matrix.survey }}${{ matrix.suffix && format(' ({0})', matrix.suffix) || '' }}
+  # Separate job for each image type to enable independent build → scan → push
+  build-k8s-ztf-science:
+    name: Build K8s ZTF science
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          # K8s builds
-          - target: k8s
-            survey: ztf
-            suffix: science
-          - target: k8s
-            survey: ztf
-            suffix: noscience
-          - target: k8s
-            survey: rubin
-            suffix: science
-          - target: k8s
-            survey: rubin
-            suffix: noscience
-          # Sentinel builds
-          - target: sentinel
-            survey: ztf
-            suffix: ""
-          - target: sentinel
-            survey: rubin
-            suffix: ""
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
