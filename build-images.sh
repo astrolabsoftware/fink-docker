@@ -168,6 +168,8 @@ build_sentinel() {
     fi
 
     echo "Building $SURVEY sentinel image with tag: $TAG"
+    echo "Versions will be sourced from ${SURVEY}/versions.sentinel.sh inside the Docker build"
+
     docker build $EXTRA_ARGS \
         --tag "$CIUX_IMAGE_URL" \
         -f "$DIR/Dockerfile.sentinel" \

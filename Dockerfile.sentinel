@@ -15,11 +15,6 @@
 
 # Unified Dockerfile for Sentinel images (rubin/ztf)
 ARG input_survey=ztf
-ARG PYTHON_VERSION=py311_25.1.1-2
-ARG SPARK_VERSION=3.4.3
-ARG HBASE_VERSION=2.5.8
-ARG KAFKA_VERSION=3.8.1
-ARG HADOOP_VERSION=hadoop3
 
 FROM almalinux:9 AS builder
 LABEL maintainer="peloton@lal.in2p3.fr"
@@ -27,27 +22,11 @@ LABEL maintainer="peloton@lal.in2p3.fr"
 ARG input_survey
 ENV input_survey=$input_survey
 
-ARG PYTHON_VERSION
-ENV PYTHON_VERSION=$PYTHON_VERSION
-
-ARG SPARK_VERSION
-ENV SPARK_VERSION=$SPARK_VERSION
-
-ARG HBASE_VERSION
-ENV HBASE_VERSION=$HBASE_VERSION
-
-ARG KAFKA_VERSION
-ENV KAFKA_VERSION=$KAFKA_VERSION
-
-ARG HADOOP_VERSION
-ENV HADOOP_VERSION=$HADOOP_VERSION
-
 ENV USRLIBS /home/libs
-
-ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
 
 WORKDIR $USRLIBS
 COPY . .
+COPY ${input_survey}/versions.sentinel.sh ./versions.sentinel.sh
 
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
@@ -57,19 +36,20 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 && rm -rf /var/cache \
 && echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
 
-# install python
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
-&& bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda
+ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
 
-# Install Apache Kafka, HBase and Spark. Install Python deps.
-RUN source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} \
-&& source common/scripts/install_hbase.sh --version ${HBASE_VERSION} \
-&& source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} \
-&& cd $USRLIBS/deps/${input_survey} \
-&& pip install --no-cache-dir --upgrade pip setuptools wheel \
-&& $USRLIBS/common/scripts/install_python_deps.sh \
-&& cd $USRLIBS \
-&& find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
+# Install python, Kafka, HBase and Spark with sourced versions
+RUN source ./versions.sentinel.sh && \
+    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
+    source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
+    source common/scripts/install_hbase.sh --version ${HBASE_VERSION} && \
+    source common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
+    cd $USRLIBS/${input_survey}/deps && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    $USRLIBS/common/scripts/install_python_deps.sh && \
+    cd $USRLIBS && \
+    find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
 
 # Stage 2
 FROM almalinux:9
@@ -77,33 +57,20 @@ FROM almalinux:9
 ARG input_survey
 ENV input_survey=$input_survey
 
-ARG PYTHON_VERSION
-ENV PYTHON_VERSION=$PYTHON_VERSION
-
-ARG SPARK_VERSION
-ENV SPARK_VERSION=$SPARK_VERSION
-
-ARG HBASE_VERSION
-ENV HBASE_VERSION=$HBASE_VERSION
-
-ARG KAFKA_VERSION
-ENV KAFKA_VERSION=$KAFKA_VERSION
-
-ARG HADOOP_VERSION
-ENV HADOOP_VERSION=$HADOOP_VERSION
-
 ENV USRLIBS /home/libs
-
-ENV SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}
-ENV KAFKA_HOME=$USRLIBS/kafka
-ENV SPARKLIB=${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip
-ENV PATH=${USRLIBS}/miniconda/bin:${SPARK_HOME}/bin:${SPARK_HOME}/sbin:/usr/local/bin:${PATH}
-ENV BINPATH=$PATH
-ENV PYTHONPATH=${SPARKLIB}:${PYTHONPATH}
 
 WORKDIR $USRLIBS
 
 COPY --from=builder $USRLIBS $USRLIBS
+
+# Set up environment based on versions
+RUN source ./versions.sentinel.sh && \
+    echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
+    echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
+    echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
+    echo "export PATH=${USRLIBS}/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
+    echo "export BINPATH=\${PATH}" >> /etc/environment && \
+    echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/environment
 
 # Install Java and useful utilities
 RUN dnf -y update \
@@ -114,4 +81,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT source ./versions.sentinel.sh && source common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
