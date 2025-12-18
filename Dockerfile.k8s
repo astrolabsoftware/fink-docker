@@ -55,11 +55,11 @@ USER ${spark_uid}
 
 WORKDIR $HOME
 
-# Install python
-ARG PYTHON_VERSION=py39_4.11.0
-ENV PYTHON_VERSION=$PYTHON_VERSION
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O $HOME/miniconda.sh \
-    && bash $HOME/miniconda.sh -b -p $HOME/miniconda
+# Install python using survey-specific version
+COPY ${input_survey}/python_version.sh /tmp/python_version.sh
+RUN source /tmp/python_version.sh && \
+    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O $HOME/miniconda.sh && \
+    bash $HOME/miniconda.sh -b -p $HOME/miniconda
 
 ENV PATH $HOME/miniconda/bin:$PATH
 ENV FINK_HOME=$HOME/fink-broker

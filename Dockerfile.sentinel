@@ -27,6 +27,7 @@ ENV USRLIBS /home/libs
 WORKDIR $USRLIBS
 COPY . .
 COPY ${input_survey}/versions.sentinel.sh ./versions.sentinel.sh
+COPY ${input_survey}/python_version.sh ./python_version.sh
 
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
@@ -40,6 +41,7 @@ ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
 
 # Install python, Kafka, HBase and Spark with sourced versions
 RUN source ./versions.sentinel.sh && \
+    source ./python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
     bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
     source common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \

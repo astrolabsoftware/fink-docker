@@ -14,8 +14,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Software versions for Rubin survey (Python version managed separately)
-export SPARK_VERSION=3.4.3
-export HBASE_VERSION=2.5.8
-export KAFKA_VERSION=3.8.1
-export HADOOP_VERSION=hadoop3
+# Python version for ZTF survey
+export PYTHON_VERSION=py39_4.11.0
