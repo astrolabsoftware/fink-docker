@@ -3,9 +3,7 @@ project: fink-deps
 registry: gitlab-registry.in2p3.fr/astrolabsoftware/fink
 sourcePathes:
   - Dockerfile.k8s
-  - rubin
-  - ztf
-  - common
+  - homefs 
 dependencies:
   - image: gitlab-registry.in2p3.fr/astrolabsoftware/fink/spark-py:k8s-3.4.1
     labels:
