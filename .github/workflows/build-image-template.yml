@@ -93,13 +93,9 @@ jobs:
     name: "Scan ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
     runs-on: ubuntu-latest
     needs: build
-    if: always() && needs.build.outputs.success == 'true'
     permissions:
       security-events: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -134,24 +130,7 @@ jobs:
     name: "Push ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
     runs-on: ubuntu-latest
     needs: [build, scan]
-    if: |
-      always() &&
-      needs.build.outputs.success == 'true' &&
-      (needs.scan.result == 'success' || needs.scan.result == 'skipped') &&
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'push'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21.4'
-
-      - name: Install ciux
-        run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
-
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -167,11 +146,11 @@ jobs:
 
       - name: Push image
         run: |
-          $(ciux get image --check $PWD --suffix "${{ inputs.ciux_suffix }}" --env)
           if [ -f artifacts/${{ inputs.artifact_name }}.tar ]; then
-            echo "Loading and pushing new image: $CIUX_IMAGE_URL"
+            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
+            echo "Loading and pushing new image: $IMAGE_NAME"
             docker load --input artifacts/${{ inputs.artifact_name }}.tar
-            docker push "$CIUX_IMAGE_URL"
+            docker push "$IMAGE_NAME"
           else
             echo "No new image to push (image already exists in registry)"
           fi
