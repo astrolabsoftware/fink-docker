@@ -37,7 +37,7 @@ ADD containerfs/common/deps/jars-urls.txt /opt/fink-broker/common/deps/
 RUN xargs -n 1 curl --fail --output-dir /opt/spark/jars -O < /opt/fink-broker/common/deps/jars-urls.txt
 
 # Main process will run as spark_uid
-ENV HOME=/opt/fink-broker
+ENV HOME=/home/fink-broker
 RUN mkdir -p $HOME && chown ${spark_uid} $HOME
 
 # Setup for the Prometheus JMX exporter.
@@ -58,11 +58,11 @@ USER ${spark_uid}
 WORKDIR $HOME
 
 # Copy survey-specific files and common scripts
-ADD --chown=${spark_uid} containerfs/common/ $HOME/common/
-ADD --chown=${spark_uid} containerfs/${input_survey}/ $HOME/${input_survey}/
+ADD --chown=${spark_uid} containerfs/common/ /opt/fink-broker/common/
+ADD --chown=${spark_uid} containerfs/${input_survey}/ /opt/fink-broker/${input_survey}/
 
 # Install python using survey-specific version
-RUN source $HOME/${input_survey}/python_version.sh && \
+RUN source /opt/fink-broker/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O $HOME/miniconda.sh && \
     bash $HOME/miniconda.sh -b -p $HOME/miniconda
 
@@ -75,7 +75,7 @@ ENV PATH=$FINK_HOME/bin:$PATH
 ENV PIP_NO_CACHE_DIR=1
 
 # Install noscience dependencies using unified script
-RUN $HOME/common/scripts/install_python_deps.sh --survey ${input_survey} --noscience --verbose
+RUN /opt/fink-broker/common/scripts/install_python_deps.sh --survey ${input_survey} --noscience --verbose
 
 ENV FINK_ALERT_SCHEMAS_VERSION=v0.0.2-rc0
 RUN git clone -c advice.detachedHead=false --depth 1 --filter=blob:none --sparse --branch "${FINK_ALERT_SCHEMAS_VERSION}" https://github.com/astrolabsoftware/fink-alert-schemas.git \
@@ -93,5 +93,5 @@ ADD --chown=${spark_uid} . $FINK_HOME/
 
 FROM noscience AS science
 
-# Install science dependencies using unified script (files already copied from homefs)
-RUN $HOME/common/scripts/install_python_deps.sh --survey ${input_survey} --science --verbose
+# Install science dependencies using unified script (files already copied from containerfs)
+RUN /opt/fink-broker/common/scripts/install_python_deps.sh --survey ${input_survey} --science --verbose
