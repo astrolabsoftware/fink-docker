@@ -2,7 +2,7 @@ name: "Build, scan and push Fink Docker images"
 
 on:
   push:
-    branches: [main]
+    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
   pull_request:
     branches: [main]
   workflow_dispatch:
