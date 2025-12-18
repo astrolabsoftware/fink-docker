@@ -35,8 +35,8 @@ env:
   REGISTRY: gitlab-registry.in2p3.fr
 
 jobs:
-  build:
-    name: "Build ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
+  build-and-push:
+    name: "Build and push ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
     runs-on: ubuntu-latest
     outputs:
       success: ${{ steps.build.outcome == 'success' }}
@@ -71,10 +71,17 @@ jobs:
       - name: Install ciux
         run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
 
-      - name: Build image
+      - name: Login to GitLab Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.gitlab_registry_username }}
+          password: ${{ secrets.gitlab_registry_token }}
+
+      - name: Build and push image
         id: build
         run: |
-          mkdir -p $HOME/.ciux artifacts
+          mkdir -p $HOME/.ciux
           echo "Building ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix }} image..."
 
           # Build based on target
@@ -88,84 +95,41 @@ jobs:
             ./build-images.sh -t sentinel -i ${{ inputs.survey }} --verbose
           fi
 
-          # Export image
+          # Get image info and push if new
           $(ciux get image --check $PWD --suffix "${{ inputs.ciux_suffix }}" --env)
-          if [ $CIUX_BUILD = true ]; then
-            docker save "$CIUX_IMAGE_URL" > artifacts/${{ inputs.artifact_name }}.tar
-          else
-            touch artifacts/${{ inputs.artifact_name }}.empty
-          fi
           echo "image-url=$CIUX_IMAGE_URL" >> "$GITHUB_OUTPUT"
           echo "new-build=$CIUX_BUILD" >> "$GITHUB_OUTPUT"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: artifacts
+          if [ $CIUX_BUILD = true ]; then
+            echo "Pushing new image: $CIUX_IMAGE_URL"
+            docker push "$CIUX_IMAGE_URL"
+          else
+            echo "No new image to push (image already exists in registry)"
+          fi
 
   scan:
     name: "Scan ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-push
+    if: needs.build-and-push.outputs.new-build == 'true'
     permissions:
       security-events: write
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: artifacts
 
       - name: Security scan
         run: |
-          if [ -f artifacts/${{ inputs.artifact_name }}.tar ]; then
-            echo "Loading image for scan..."
-            docker load --input artifacts/${{ inputs.artifact_name }}.tar
-            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
-            echo "Scanning image: $IMAGE_NAME"
+          IMAGE_URL="${{ needs.build-and-push.outputs.image-url }}"
+          echo "Pulling and scanning image: $IMAGE_URL"
+          docker pull "$IMAGE_URL"
 
-            # Run Trivy scan
-            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-              -v $PWD:/tmp/output aquasec/trivy:latest image \
-              --format sarif --output /tmp/output/trivy-results-${{ inputs.artifact_name }}.sarif \
-              "$IMAGE_NAME"
-          else
-            echo "No new image to scan (using existing image)"
-            echo '{"version":"2.1.0","runs":[]}' > trivy-results-${{ inputs.artifact_name }}.sarif
-          fi
+          # Run Trivy scan
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $PWD:/tmp/output aquasec/trivy:latest image \
+            --format sarif --output /tmp/output/trivy-results-${{ inputs.artifact_name }}.sarif \
+            "$IMAGE_URL"
 
       - name: Upload scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: trivy-results-${{ inputs.artifact_name }}.sarif
-
-  push:
-    name: "Push ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
-    runs-on: ubuntu-latest
-    needs: [build, scan]
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: artifacts
-
-      - name: Login to GitLab Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.gitlab_registry_username }}
-          password: ${{ secrets.gitlab_registry_token }}
-
-      - name: Push image
-        run: |
-          if [ -f artifacts/${{ inputs.artifact_name }}.tar ]; then
-            IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -1)
-            echo "Loading and pushing new image: $IMAGE_NAME"
-            docker load --input artifacts/${{ inputs.artifact_name }}.tar
-            docker push "$IMAGE_NAME"
-          else
-            echo "No new image to push (image already exists in registry)"
-          fi
