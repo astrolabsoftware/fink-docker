@@ -22,11 +22,12 @@ LABEL maintainer="peloton@lal.in2p3.fr"
 ARG input_survey
 ENV input_survey=$input_survey
 
-ENV USRLIBS /opt/fink-broker
+ENV FINK_BROKER_ROOT /opt/fink-broker
 
-WORKDIR $USRLIBS
-COPY containerfs/common/ $USRLIBS/common/
-COPY containerfs/${input_survey}/ $USRLIBS/${input_survey}/
+WORKDIR $FINK_BROKER_ROOT
+COPY containerfs/sentinel/ $FINK_BROKER_ROOT/sentinel/
+COPY containerfs/${input_survey}/ $FINK_BROKER_ROOT/${input_survey}/
+COPY containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
 
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
@@ -36,19 +37,19 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 && rm -rf /var/cache \
 && echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
 
-ENV PATH=${USRLIBS}/miniconda/bin:/usr/local/bin:${PATH}
+ENV PATH=${FINK_BROKER_ROOT}/miniconda/bin:/usr/local/bin:${PATH}
 
 # Install python, Kafka, HBase and Spark with sourced versions
-RUN source /opt/fink-broker/${input_survey}/versions.sentinel.sh && \
-    source /opt/fink-broker/${input_survey}/python_version.sh && \
+RUN source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && \
+    source ${FINK_BROKER_ROOT}/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
-    bash ~/miniconda.sh -b -p ${USRLIBS}/miniconda && \
-    source /opt/fink-broker/common/scripts/install_kafka.sh --version ${KAFKA_VERSION} && \
-    source /opt/fink-broker/common/scripts/install_hbase.sh --version ${HBASE_VERSION} && \
-    source /opt/fink-broker/common/scripts/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
+    bash ~/miniconda.sh -b -p ${FINK_BROKER_ROOT}/miniconda && \
+    source ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION} && \
+    source ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION} && \
+    source ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    HOME=${USRLIBS} $USRLIBS/common/scripts/install_python_deps.sh --survey ${input_survey} --science && \
-    cd $USRLIBS && \
+    HOME=${FINK_BROKER_ROOT} ${FINK_BROKER_ROOT}/install_python_deps.sh --survey ${input_survey} --science && \
+    cd $FINK_BROKER_ROOT && \
     find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
 
 # Stage 2
@@ -61,15 +62,15 @@ ENV USRLIBS /home/libs
 
 WORKDIR $USRLIBS
 
-COPY --from=builder $USRLIBS $USRLIBS
+COPY --from=builder $FINK_BROKER_ROOT $USRLIBS
 
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
-RUN source /opt/fink-broker/${input_survey}/versions.sentinel.sh && \
+RUN source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && \
     echo "export SPARK_HOME=$USRLIBS/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
     echo "export KAFKA_HOME=$USRLIBS/kafka" >> /etc/environment && \
     echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
-    echo "export PATH=${USRLIBS}/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
+    echo "export PATH=$USRLIBS/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
     echo "export BINPATH=\${PATH}" >> /etc/environment && \
     echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/environment
 
@@ -82,4 +83,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source /opt/fink-broker/${input_survey}/versions.sentinel.sh && source /opt/fink-broker/common/scripts/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && source ${FINK_BROKER_ROOT}/sentinel/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash

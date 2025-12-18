@@ -85,13 +85,13 @@ if [[ ! "$SURVEY" =~ ^(rubin|ztf)$ ]]; then
 fi
 
 # Set requirements path based on fink-broker installation
-REQUIREMENTS_PATH="/opt/fink-broker/${SURVEY}/deps"
+REQUIREMENTS_PATH="${FINK_BROKER_ROOT:-/opt/fink-broker}/${SURVEY}/deps"
 
 # Debug information in verbose mode
 if [[ "$VERBOSE" == true ]]; then
     echo "DEBUG: Current working directory: $(pwd)"
     echo "DEBUG: HOME directory: ${HOME}"
-    echo "DEBUG: Fink-broker directory: /opt/fink-broker"
+    echo "DEBUG: Fink-broker directory: ${FINK_BROKER_ROOT:-/opt/fink-broker}"
     echo "DEBUG: Requirements path: ${REQUIREMENTS_PATH}"
     echo "DEBUG: Available files:"
     ls -la
