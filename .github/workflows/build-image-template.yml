@@ -25,10 +25,9 @@ on:
         type: string
         description: 'CIUX suffix for image naming'
     secrets:
-      gitlab_registry_username:
+      registry_username:
         required: true
-      gitlab_registry_token:
-        required: true
+      registry_token:
 
 env:
   CIUX_VERSION: v0.0.7-rc1
@@ -71,12 +70,12 @@ jobs:
       - name: Install ciux
         run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
 
-      - name: Login to GitLab Registry
-        uses: docker/login-action@v3
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.gitlab_registry_username }}
-          password: ${{ secrets.gitlab_registry_token }}
+          registry: gitlab-registry.in2p3.fr
+          username: ${{ secrets.registry_username }}
+          password: ${{ secrets.registry_token }}
 
       - name: Build and push image
         id: build
