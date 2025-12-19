@@ -17,5 +17,5 @@ jobs:
       artifact_name: k8s-rubin-science
       ciux_suffix: science-rubin
     secrets:
-      gitlab_registry_username: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
-      gitlab_registry_token: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+      registry_username: ${{ secrets.REGISTRY_USERNAME }}
+      registry_token: ${{ secrets.REGISTRY_TOKEN }}
