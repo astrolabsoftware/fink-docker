@@ -70,14 +70,7 @@ jobs:
       - name: Install ciux
         run: go install github.com/k8s-school/ciux@"${{ env.CIUX_VERSION }}"
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          registry: gitlab-registry.in2p3.fr
-          username: ${{ secrets.registry_username }}
-          password: ${{ secrets.registry_token }}
-
-      - name: Build and push image
+      - name: Build image
         id: build
         run: |
           mkdir -p $HOME/.ciux
@@ -94,17 +87,24 @@ jobs:
             ./build-images.sh -t sentinel -i ${{ inputs.survey }} --verbose
           fi
 
-          # Get image info and push if new
+          # Get image info
           $(ciux get image --check $PWD --suffix "${{ inputs.ciux_suffix }}" --env)
           echo "image-url=$CIUX_IMAGE_URL" >> "$GITHUB_OUTPUT"
           echo "new-build=$CIUX_BUILD" >> "$GITHUB_OUTPUT"
 
-          if [ $CIUX_BUILD = true ]; then
-            echo "Pushing new image: $CIUX_IMAGE_URL"
-            docker push "$CIUX_IMAGE_URL"
-          else
-            echo "No new image to push (image already exists in registry)"
-          fi
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        if: steps.build.outputs.new-build == 'true'
+        with:
+          registry: gitlab-registry.in2p3.fr
+          username: ${{ secrets.registry_username }}
+          password: ${{ secrets.registry_token }}
+
+      - name: Push image
+        if: steps.build.outputs.new-build == 'true'
+        run: |
+          echo "Pushing new image: ${{ steps.build.outputs.image-url }}"
+          docker push "${{ steps.build.outputs.image-url }}"
 
   scan:
     name: "Scan ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix && format(' {0}', inputs.suffix) || '' }}"
@@ -114,6 +114,16 @@ jobs:
     permissions:
       security-events: write
     steps:
+      - name: Maximize build space
+        run: |
+          echo "Removing unwanted software before scanning..."
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force
+          df -h
 
       - name: Security scan
         run: |
@@ -121,10 +131,14 @@ jobs:
           echo "Pulling and scanning image: $IMAGE_URL"
           docker pull "$IMAGE_URL"
 
-          # Run Trivy scan
+          # Run Trivy scan with cache directory optimization
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-            -v $PWD:/tmp/output aquasec/trivy:latest image \
+            -v $PWD:/tmp/output \
+            -v /tmp/trivy-cache:/root/.cache/trivy \
+            aquasec/trivy:latest image \
             --format sarif --output /tmp/output/trivy-results-${{ inputs.artifact_name }}.sarif \
+            --cache-dir /root/.cache/trivy \
+            --timeout 15m \
             "$IMAGE_URL"
 
       - name: Upload scan results
