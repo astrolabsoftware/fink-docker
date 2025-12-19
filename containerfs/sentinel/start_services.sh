@@ -13,58 +13,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-message_help="""
-Start Apache Kafka and Apache HBase services\n\n
-Usage:\n
-    ./start_services.sh [--hbase-version] [--kafka-version] [-h] \n\n
 
-Specify the versions with --<kafka, hbase>-version.\n
-Use -h to display this help.
-"""
-
-# Show help if no arguments is given
-if [[ $1 == "" ]]; then
-  echo -e $message_help
+# Auto-load versions based on SURVEY environment variable
+if [[ -z "$SURVEY" ]]; then
+  echo "ERROR: SURVEY environment variable is not set"
   exit 1
 fi
 
-# Grab the command line arguments
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    -h)
-        echo -e $message_help
-        exit
-        ;;
-    --kafka-version)
-        if [[ $2 == "" ]]; then
-          echo "$1 requires an argument" >&2
-          exit 1
-        fi
-        KAFKA_VERSION="$2"
-        shift 2
-        ;;
-    --hbase-version)
-        if [[ $2 == "" ]]; then
-          echo "$1 requires an argument" >&2
-          exit 1
-        fi
-        HBASE_VERSION="$2"
-        shift 2
-        ;;
-  esac
-done
-
-if [[ $KAFKA_VERSION == "" ]]; then
-  echo "You need to specify the Kafka version with the option --version."
-  exit
+VERSIONS_FILE="${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh"
+if [[ ! -f "$VERSIONS_FILE" ]]; then
+  echo "ERROR: Versions file not found: $VERSIONS_FILE"
+  exit 1
 fi
 
-if [[ $HBASE_VERSION == "" ]]; then
-  echo "You need to specify the HBase version with the option --version."
-  exit
+echo "Loading versions for survey: $SURVEY"
+source "$VERSIONS_FILE"
+
+if [[ -z "$KAFKA_VERSION" || -z "$HBASE_VERSION" ]]; then
+  echo "ERROR: KAFKA_VERSION or HBASE_VERSION not loaded from $VERSIONS_FILE"
+  exit 1
 fi
 
-export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+echo "Starting services with Kafka $KAFKA_VERSION and HBase $HBASE_VERSION"
 
 hbase-${HBASE_VERSION}/bin/start-hbase.sh
 

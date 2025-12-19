@@ -21,6 +21,7 @@ LABEL maintainer="peloton@lal.in2p3.fr"
 
 ARG input_survey
 ENV input_survey=$input_survey
+ENV SURVEY=$input_survey
 
 ENV FINK_BROKER_ROOT /opt/fink-broker
 
@@ -40,7 +41,7 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 ENV PATH=${FINK_BROKER_ROOT}/miniconda/bin:/usr/local/bin:${PATH}
 
 # Install python, Kafka, HBase and Spark with sourced versions
-RUN source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && \
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
     source ${FINK_BROKER_ROOT}/${input_survey}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
     bash ~/miniconda.sh -b -p ${FINK_BROKER_ROOT}/miniconda && \
@@ -57,6 +58,7 @@ FROM almalinux:9
 
 ARG input_survey
 ENV input_survey=$input_survey
+ENV SURVEY=$input_survey
 
 ENV FINK_BROKER_ROOT /opt/fink-broker
 
@@ -66,13 +68,13 @@ COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
-RUN source $FINK_BROKER_ROOT/${input_survey}/versions.sentinel.sh && \
-    echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/environment && \
-    echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/environment && \
-    echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/environment && \
-    echo "export PATH=$FINK_BROKER_ROOT/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/environment && \
-    echo "export BINPATH=\${PATH}" >> /etc/environment && \
-    echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/environment
+RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
+    echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/bash.bashrc && \
+    echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/bash.bashrc && \
+    echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/bash.bashrc && \
+    echo "export PATH=$FINK_BROKER_ROOT/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/bash.bashrc && \
+    echo "export BINPATH=\${PATH}" >> /etc/bash.bashrc && \
+    echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/bash.bashrc
 
 # Install Java and useful utilities
 RUN dnf -y update \
@@ -83,4 +85,4 @@ RUN dnf -y update \
 
 ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
 
-ENTRYPOINT source ${FINK_BROKER_ROOT}/${input_survey}/versions.sentinel.sh && source ${FINK_BROKER_ROOT}/sentinel/start_services.sh --kafka-version ${KAFKA_VERSION} --hbase-version ${HBASE_VERSION} && /bin/bash
+ENTRYPOINT ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash
