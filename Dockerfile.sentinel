@@ -30,13 +30,16 @@ COPY containerfs/sentinel/ $FINK_BROKER_ROOT/sentinel/
 COPY containerfs/${input_survey}/ $FINK_BROKER_ROOT/${input_survey}/
 COPY containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
 
+# Define Java home path
+ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
+
 # Install system build dependencies
 RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 && dnf -y install lsof which git wget procps\
 && dnf -y groupinstall "Development Tools" \
 && dnf -y clean all \
 && rm -rf /var/cache \
-&& echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
+&& echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/javahome.sh
 
 ENV PATH=${FINK_BROKER_ROOT}/miniconda/bin:/usr/local/bin:${PATH}
 
@@ -81,8 +84,6 @@ RUN dnf -y update \
 && dnf -y install which git wget java-11-openjdk \
 && dnf -y clean all \
 && rm -rf /var/cache \
-&& echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(type -P java))))" > /etc/profile.d/javahome.sh
-
-ENV JAVA_HOME="$(dirname $(dirname $(readlink -f $(type -P java))))"
+&& echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/javahome.sh
 
 ENTRYPOINT ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash
