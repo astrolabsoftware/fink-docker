@@ -38,8 +38,7 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 && dnf -y install lsof which git wget procps\
 && dnf -y groupinstall "Development Tools" \
 && dnf -y clean all \
-&& rm -rf /var/cache \
-&& echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/javahome.sh
+&& rm -rf /var/cache
 
 ENV PATH=${FINK_BROKER_ROOT}/miniconda/bin:/usr/local/bin:${PATH}
 
@@ -74,7 +73,6 @@ COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
 RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
-    echo "export JAVA_HOME=$JAVA_HOME" >> /etc/bash.bashrc && \
     echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/bash.bashrc && \
     echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/bash.bashrc && \
     echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/bash.bashrc && \
@@ -86,7 +84,6 @@ RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
 RUN dnf -y update \
 && dnf -y install which git wget java-11-openjdk \
 && dnf -y clean all \
-&& rm -rf /var/cache \
-&& echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/javahome.sh
+&& rm -rf /var/cache
 
 ENTRYPOINT ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash
