@@ -36,6 +36,10 @@ fi
 
 echo "Starting services with Kafka $KAFKA_VERSION and HBase $HBASE_VERSION"
 
+# Ensure JAVA_HOME is set for HBase
+export JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
+echo "Using JAVA_HOME: $JAVA_HOME"
+
 hbase-${HBASE_VERSION}/bin/start-hbase.sh
 
 # Wait for ZooKeeper to be ready before starting Kafka
