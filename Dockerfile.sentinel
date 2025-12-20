@@ -64,6 +64,8 @@ ENV input_survey=$input_survey
 ENV SURVEY=$input_survey
 
 ENV FINK_BROKER_ROOT /opt/fink-broker
+# Redefine JAVA_HOME for the runtime stage
+ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
 
 WORKDIR $FINK_BROKER_ROOT
 
