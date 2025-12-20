@@ -38,7 +38,23 @@ echo "Starting services with Kafka $KAFKA_VERSION and HBase $HBASE_VERSION"
 
 hbase-${HBASE_VERSION}/bin/start-hbase.sh
 
-# Zookeeper already started with HBase standalone
+# Wait for ZooKeeper to be ready before starting Kafka
+echo "Waiting for ZooKeeper to be ready..."
+for i in {1..30}; do
+  # Try to connect to ZooKeeper using telnet or timeout-based connection test
+  if timeout 2 bash -c "</dev/tcp/localhost/2181" 2>/dev/null; then
+    echo "ZooKeeper is ready"
+    break
+  fi
+  if [ $i -eq 30 ]; then
+    echo "ERROR: ZooKeeper failed to start within 30 seconds"
+    exit 1
+  fi
+  echo "ZooKeeper not ready yet, waiting... ($i/30)"
+  sleep 1
+done
+
+# Start Kafka now that ZooKeeper is ready
 kafka_2.12-${KAFKA_VERSION}/bin/kafka-server-start.sh kafka_2.12-${KAFKA_VERSION}/config/server.properties &
 
 exec "$@"
