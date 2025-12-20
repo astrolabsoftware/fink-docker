@@ -72,6 +72,7 @@ COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 # Configure system environment variables for Spark, Kafka, and Python tools
 # Makes spark-submit, kafka-topics, and other binaries available in all shells
 RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
+    echo "export JAVA_HOME=$JAVA_HOME" >> /etc/bash.bashrc && \
     echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/bash.bashrc && \
     echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/bash.bashrc && \
     echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/bash.bashrc && \
