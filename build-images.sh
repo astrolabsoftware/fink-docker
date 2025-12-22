@@ -30,7 +30,7 @@ Usage: $(basename "$0") [options]
   Available options:
     -h                  this message
     -t TARGET           target to build: k8s, sentinel
-    -s SUFFIX           image suffix for k8s builds: noscience, science (default: science)
+    --noscience         build noscience image (k8s only, default: science)
     -i SURVEY           survey: ztf, rubin (default: ztf)
     --verbose           verbose build output
 
@@ -39,17 +39,17 @@ Build Fink Docker images:
   - sentinel: Build sentinel development image (specify survey with -i)
 
 Examples:
-  $(basename "$0") -t k8s -s noscience -i ztf       # K8s noscience image for ZTF
-  $(basename "$0") -t k8s -s science -i rubin       # K8s science image for Rubin
-  $(basename "$0") -t sentinel -i rubin   # Sentinel Rubin image
-  $(basename "$0") -t sentinel -i ztf    # Sentinel ZTF image
+  $(basename "$0") -t k8s --noscience -i ztf        # K8s noscience image for ZTF
+  $(basename "$0") -t k8s -i rubin                  # K8s science image for Rubin
+  $(basename "$0") -t sentinel -i rubin             # Sentinel Rubin image
+  $(basename "$0") -t sentinel -i ztf               # Sentinel ZTF image
 
 EOD
 }
 
 # Default values
 TARGET=""
-SUFFIX="science"
+NOSCIENCE=false
 SURVEY="ztf"
 VERBOSE=false
 
@@ -64,9 +64,9 @@ while [[ $# -gt 0 ]]; do
             TARGET="$2"
             shift 2
             ;;
-        -s|--suffix)
-            SUFFIX="$2"
-            shift 2
+        --noscience)
+            NOSCIENCE=true
+            shift
             ;;
         -i|--survey)
             SURVEY="$2"
@@ -102,9 +102,9 @@ if [[ ! "$SURVEY" =~ ^(ztf|rubin)$ ]]; then
     exit 1
 fi
 
-# Validate suffix for k8s builds
-if [[ "$TARGET" == "k8s" && ! "$SUFFIX" =~ ^(science|noscience)$ ]]; then
-    echo "Error: Invalid suffix '$SUFFIX' for k8s build. Must be: science or noscience"
+# Validate that noscience is only used with k8s target
+if [[ "$TARGET" == "sentinel" && "$NOSCIENCE" == true ]]; then
+    echo "Error: --noscience option is only supported for k8s builds"
     exit 1
 fi
 
@@ -118,6 +118,15 @@ fi
 
 # Build functions
 build_k8s() {
+    # Determine suffix based on noscience flag
+    if [[ "$NOSCIENCE" == true ]]; then
+        SUFFIX="noscience"
+        docker_target="noscience"
+    else
+        SUFFIX="science"
+        docker_target="science"
+    fi
+
     echo "Building K8s image for $SURVEY survey with $SUFFIX target"
 
     # This command avoid building if not needed
@@ -131,13 +140,6 @@ build_k8s() {
 
     ciux ignite --selector build,k8s "$DIR" --suffix "$SUFFIX"
     . $DIR/.ciux.d/ciux_build-k8s.sh
-
-    # Determine docker target
-    if [[ "$SUFFIX" =~ ^noscience* ]]; then
-        docker_target="noscience"
-    else
-        docker_target="science"
-    fi
 
     # Build K8s image
     docker image build $EXTRA_ARGS \

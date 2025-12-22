@@ -77,11 +77,11 @@ jobs:
           echo "Building ${{ inputs.target }} ${{ inputs.survey }}${{ inputs.suffix }} image..."
 
           # Build based on target
-          SUFFIX_OPT=""
-          if [ "${{ inputs.target }}" = "k8s" ] && [ -n "${{ inputs.suffix }}" ]; then
-            SUFFIX_OPT="-s ${{ inputs.suffix }}"
+          NOSCIENCE_OPT=""
+          if [ "${{ inputs.target }}" = "k8s" ] && [ "${{ inputs.suffix }}" = "noscience" ]; then
+            NOSCIENCE_OPT="--noscience"
           fi
-          ./build-images.sh -t ${{ inputs.target }} -i ${{ inputs.survey }} ${SUFFIX_OPT} --verbose
+          ./build-images.sh -t ${{ inputs.target }} -i ${{ inputs.survey }} ${NOSCIENCE_OPT} --verbose
 
           # Get image info
           $(ciux get image --check $PWD --suffix "${{ inputs.ciux_suffix }}" --env)
