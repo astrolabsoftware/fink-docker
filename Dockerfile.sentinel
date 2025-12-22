@@ -39,15 +39,25 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 && dnf -y clean all \
 && rm -rf /var/cache
 
-# Install python, Kafka, HBase and Spark with sourced versions
+# Install Kafka
 RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
-    source ${FINK_BROKER_ROOT}/${SURVEY}/python_version.sh && \
+    bash ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION}
+
+# Install HBase
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
+    bash ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION}
+
+# Install Spark
+RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
+    bash ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION}
+
+# Install miniconda
+RUN source ${FINK_BROKER_ROOT}/${SURVEY}/python_version.sh && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh && \
-    bash ~/miniconda.sh -b -p ${FINK_BROKER_ROOT}/miniconda && \
-    source ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION} && \
-    source ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION} && \
-    source ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION} && \
-    pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    bash ~/miniconda.sh -b -p ${FINK_BROKER_ROOT}/miniconda
+
+# Install Python dependencies and cleanup
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     HOME=${FINK_BROKER_ROOT} ${FINK_BROKER_ROOT}/install_python_deps.sh --survey ${SURVEY} --science && \
     cd $FINK_BROKER_ROOT && \
     find miniconda \( -type d -a -name test -o -name tests \) -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' \+
