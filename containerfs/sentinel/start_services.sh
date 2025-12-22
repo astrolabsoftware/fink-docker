@@ -57,3 +57,21 @@ done
 
 # Start Kafka now that ZooKeeper is ready
 ${FINK_BROKER_ROOT}/kafka_2.12-${KAFKA_VERSION}/bin/kafka-server-start.sh ${FINK_BROKER_ROOT}/kafka_2.12-${KAFKA_VERSION}/config/server.properties &
+
+# Wait for Kafka to be ready
+echo "Waiting for Kafka to be ready..."
+for i in {1..30}; do
+  # Check if Kafka is ready by trying to list topics
+  if ${FINK_BROKER_ROOT}/kafka_2.12-${KAFKA_VERSION}/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1; then
+    echo "Kafka is ready"
+    break
+  fi
+  if [ $i -eq 30 ]; then
+    echo "ERROR: Kafka failed to start within 30 seconds"
+    exit 1
+  fi
+  echo "Kafka not ready yet, waiting... ($i/30)"
+  sleep 1
+done
+
+echo "All services started successfully"
