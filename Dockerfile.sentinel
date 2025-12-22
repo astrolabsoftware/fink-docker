@@ -41,19 +41,19 @@ RUN dnf clean all && rm -r /var/cache/dnf && dnf -y update \
 
 # Install Kafka
 RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
-    bash ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION}
+    ${FINK_BROKER_ROOT}/sentinel/install_kafka.sh --version ${KAFKA_VERSION}
 
 # Install HBase
 RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
-    bash ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION}
+    ${FINK_BROKER_ROOT}/sentinel/install_hbase.sh --version ${HBASE_VERSION}
 
 # Install Spark
 RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
-    bash ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION}
+    ${FINK_BROKER_ROOT}/sentinel/install_spark.sh --spark-version ${SPARK_VERSION} --hadoop-version ${HADOOP_VERSION}
 
 # Install miniconda
 RUN source ${FINK_BROKER_ROOT}/${SURVEY}/python_version.sh && \
-    bash ${FINK_BROKER_ROOT}/sentinel/install_miniconda.sh --version ${PYTHON_VERSION}
+    ${FINK_BROKER_ROOT}/sentinel/install_miniconda.sh --version ${PYTHON_VERSION}
 
 # Install Python dependencies and cleanup
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
