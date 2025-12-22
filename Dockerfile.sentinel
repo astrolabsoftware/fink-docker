@@ -28,6 +28,7 @@ WORKDIR $FINK_BROKER_ROOT
 COPY containerfs/sentinel/ $FINK_BROKER_ROOT/sentinel/
 COPY containerfs/${SURVEY}/ $FINK_BROKER_ROOT/${SURVEY}/
 COPY containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
+COPY containerfs/install_miniconda.sh $FINK_BROKER_ROOT/
 
 # Define Java home path
 ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
@@ -53,7 +54,7 @@ RUN source ${FINK_BROKER_ROOT}/sentinel/versions.${SURVEY}.sh && \
 
 # Install miniconda
 RUN source ${FINK_BROKER_ROOT}/${SURVEY}/python_version.sh && \
-    ${FINK_BROKER_ROOT}/sentinel/install_miniconda.sh --version ${PYTHON_VERSION}
+    ${FINK_BROKER_ROOT}/install_miniconda.sh --version ${PYTHON_VERSION}
 
 # Install Python dependencies and cleanup
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \

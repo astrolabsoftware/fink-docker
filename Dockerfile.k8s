@@ -61,7 +61,7 @@ WORKDIR $HOME
 # Copy survey-specific files and install scripts
 ADD --chown=${spark_uid} containerfs/${input_survey}/ $FINK_BROKER_ROOT/${input_survey}/
 ADD --chown=${spark_uid} containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
-ADD --chown=${spark_uid} containerfs/sentinel/install_miniconda.sh $FINK_BROKER_ROOT/
+ADD --chown=${spark_uid} containerfs/install_miniconda.sh $FINK_BROKER_ROOT/
 
 # Install python using survey-specific version
 RUN source $FINK_BROKER_ROOT/${input_survey}/python_version.sh && \
