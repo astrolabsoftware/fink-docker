@@ -70,15 +70,6 @@ WORKDIR $FINK_BROKER_ROOT
 
 COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 
-# Configure system environment variables for Spark, Kafka, and Python tools
-# Makes spark-submit, kafka-topics, and other binaries available in all shells
-RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
-    echo "export SPARK_HOME=$FINK_BROKER_ROOT/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}" >> /etc/bash.bashrc && \
-    echo "export KAFKA_HOME=$FINK_BROKER_ROOT/kafka" >> /etc/bash.bashrc && \
-    echo "export SPARKLIB=\${SPARK_HOME}/python:\${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip" >> /etc/bash.bashrc && \
-    echo "export PATH=$FINK_BROKER_ROOT/miniconda/bin:\${SPARK_HOME}/bin:\${SPARK_HOME}/sbin:/usr/local/bin:\${PATH}" >> /etc/bash.bashrc && \
-    echo "export BINPATH=\${PATH}" >> /etc/bash.bashrc && \
-    echo "export PYTHONPATH=\${SPARKLIB}:\${PYTHONPATH}" >> /etc/bash.bashrc
 
 # Install Java and useful utilities
 RUN dnf -y update \
@@ -86,4 +77,4 @@ RUN dnf -y update \
 && dnf -y clean all \
 && rm -rf /var/cache
 
-CMD ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash --rcfile /etc/bash.bashrc
+CMD ${FINK_BROKER_ROOT}/sentinel/start_services.sh && source ${FINK_BROKER_ROOT}/sentinel/env.sh && /bin/bash
