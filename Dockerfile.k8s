@@ -58,16 +58,16 @@ USER ${spark_uid}
 
 WORKDIR $HOME
 
-# Copy survey-specific files and install script
+# Copy survey-specific files and install scripts
 ADD --chown=${spark_uid} containerfs/${input_survey}/ $FINK_BROKER_ROOT/${input_survey}/
 ADD --chown=${spark_uid} containerfs/install_python_deps.sh $FINK_BROKER_ROOT/
+ADD --chown=${spark_uid} containerfs/sentinel/install_miniconda.sh $FINK_BROKER_ROOT/
 
 # Install python using survey-specific version
 RUN source $FINK_BROKER_ROOT/${input_survey}/python_version.sh && \
-    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${PYTHON_VERSION}-Linux-x86_64.sh -O $HOME/miniconda.sh && \
-    bash $HOME/miniconda.sh -b -p $HOME/miniconda
+    $FINK_BROKER_ROOT/install_miniconda.sh --version ${PYTHON_VERSION}
 
-ENV PATH=$HOME/miniconda/bin:$PATH
+ENV PATH=$FINK_BROKER_ROOT/miniconda/bin:$PATH
 ENV FINK_HOME=$HOME
 ENV PYTHONPATH=$FINK_HOME:${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-*.zip
 ENV PATH=$FINK_HOME/bin:$PATH
