@@ -37,7 +37,7 @@ fi
 echo "Starting services with Kafka $KAFKA_VERSION and HBase $HBASE_VERSION"
 echo "Using JAVA_HOME: $JAVA_HOME"
 
-hbase-${HBASE_VERSION}/bin/start-hbase.sh
+${FINK_BROKER_ROOT}/hbase-${HBASE_VERSION}/bin/start-hbase.sh
 
 # Wait for ZooKeeper to be ready before starting Kafka
 echo "Waiting for ZooKeeper to be ready..."
@@ -56,6 +56,4 @@ for i in {1..30}; do
 done
 
 # Start Kafka now that ZooKeeper is ready
-kafka_2.12-${KAFKA_VERSION}/bin/kafka-server-start.sh kafka_2.12-${KAFKA_VERSION}/config/server.properties &
-
-exec "$@"
+${FINK_BROKER_ROOT}/kafka_2.12-${KAFKA_VERSION}/bin/kafka-server-start.sh ${FINK_BROKER_ROOT}/kafka_2.12-${KAFKA_VERSION}/config/server.properties &

@@ -86,4 +86,4 @@ RUN dnf -y update \
 && dnf -y clean all \
 && rm -rf /var/cache
 
-ENTRYPOINT ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash
+CMD ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash --rcfile /etc/bash.bashrc
