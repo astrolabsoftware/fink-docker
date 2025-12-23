@@ -123,13 +123,13 @@ fi
 # Install science dependencies for science mode
 if [[ "$MODE" == "science" ]]; then
     echo "Installing test requirements..."
-    pip install -r "${REQUIREMENTS_PATH}/requirements-test.txt"
+    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-test.txt"
 
     echo "Installing science requirements..."
-    pip install -r "${REQUIREMENTS_PATH}/requirements-science.txt" --use-pep517
+    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-science.txt"
 
     echo "Installing science dependencies without deps..."
-    pip install -r "${REQUIREMENTS_PATH}/requirements-science-no-deps.txt" --no-deps
+    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-science-no-deps.txt" --no-deps
 
     # ZTF-specific: dustmaps initialization
     if [[ "$SURVEY" == "ztf" ]]; then
