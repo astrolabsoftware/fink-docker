@@ -90,8 +90,6 @@ RUN pip install py4j
 ENV FINK_JARS=""
 ENV FINK_PACKAGES=""
 
-ADD --chown=${spark_uid} . $FINK_HOME/
-
 FROM noscience AS science
 
 # Install science dependencies using unified script (files already copied from containerfs)
