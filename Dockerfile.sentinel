@@ -79,16 +79,17 @@ COPY --from=builder $FINK_BROKER_ROOT $FINK_BROKER_ROOT
 
 # Create symbolic links for version-independent paths
 RUN source $FINK_BROKER_ROOT/sentinel/versions.${SURVEY}.sh && \
-    ln -sf spark-${SPARK_VERSION}-bin-${HADOOP_VERSION} $FINK_BROKER_ROOT/spark && \
-    ln -sf kafka_2.12-${KAFKA_VERSION} $FINK_BROKER_ROOT/kafka
+    ln -sf kafka_2.12-${KAFKA_VERSION} $FINK_BROKER_ROOT/kafka && \
+    ln -sf hbase-${HBASE_VERSION} $FINK_BROKER_ROOT/hbase && \
+    ln -sf spark-${SPARK_VERSION}-bin-${HADOOP_VERSION} $FINK_BROKER_ROOT/spark
 
 # Set environment variables using the symbolic links
-ENV SPARK_HOME="$FINK_BROKER_ROOT/spark"
 ENV KAFKA_HOME="$FINK_BROKER_ROOT/kafka"
-ENV PATH=$FINK_BROKER_ROOT/miniconda/bin:$PATH
+ENV HBASE_HOME="$FINK_BROKER_ROOT/hbase"
+ENV SPARK_HOME="$FINK_BROKER_ROOT/spark"
 
 ENV SPARKLIB="$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip"
-ENV PATH="$FINK_BROKER_ROOT/miniconda/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:/usr/local/bin:$PATH"
+ENV PATH="$FINK_BROKER_ROOT/miniconda/bin:$HBASE_HOME/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:$PATH"
 ENV PYTHONPATH="$SPARKLIB:$PYTHONPATH"
 
 ENV BINPATH="$PATH"
