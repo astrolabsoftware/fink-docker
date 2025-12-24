@@ -112,15 +112,14 @@ fi
 # Install base dependencies (always installed)
 echo "Installing base requirements..."
 pip install --no-cache-dir --upgrade pip setuptools wheel
-pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements.txt"
 
 echo "Installing test requirements..."
 pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-test.txt"
 
 # Install science dependencies for science mode
 if [[ "$MODE" == "science" ]]; then
-    echo "Installing science requirements..."
-    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-science.txt"
+    echo "Installing requirements (base + science) together to avoid dependency conflicts..."
+    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements.txt" -r "${REQUIREMENTS_PATH}/requirements-science.txt"
 
     echo "Installing science dependencies without deps..."
     pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-science-no-deps.txt" --no-deps
