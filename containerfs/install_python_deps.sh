@@ -114,17 +114,11 @@ echo "Installing base requirements..."
 pip install --no-cache-dir --upgrade pip setuptools wheel
 pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements.txt"
 
-# Install test dependencies for noscience mode
-if [[ "$MODE" == "noscience" ]]; then
-    echo "Installing test requirements..."
-    pip install -r "${REQUIREMENTS_PATH}/requirements-test.txt"
-fi
+echo "Installing test requirements..."
+pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-test.txt"
 
 # Install science dependencies for science mode
 if [[ "$MODE" == "science" ]]; then
-    echo "Installing test requirements..."
-    pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-test.txt"
-
     echo "Installing science requirements..."
     pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements-science.txt"
 
