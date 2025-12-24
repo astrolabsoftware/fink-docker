@@ -22,7 +22,7 @@ LABEL maintainer="peloton@lal.in2p3.fr"
 ARG input_survey
 ENV SURVEY=$input_survey
 
-ENV FINK_BROKER_ROOT /opt/fink-broker
+ENV FINK_BROKER_ROOT=/opt/fink-broker
 
 WORKDIR $FINK_BROKER_ROOT
 COPY containerfs/sentinel/ $FINK_BROKER_ROOT/sentinel/
@@ -69,7 +69,7 @@ FROM almalinux:9
 ARG input_survey
 ENV SURVEY=$input_survey
 
-ENV FINK_BROKER_ROOT /opt/fink-broker
+ENV FINK_BROKER_ROOT=/opt/fink-broker
 # Redefine JAVA_HOME for the runtime stage
 ENV JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"
 
@@ -90,7 +90,7 @@ ENV SPARK_HOME="$FINK_BROKER_ROOT/spark"
 
 ENV SPARKLIB="$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip"
 ENV PATH="$FINK_BROKER_ROOT/miniconda/bin:$HBASE_HOME/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:$PATH"
-ENV PYTHONPATH="$SPARKLIB:$PYTHONPATH"
+ENV PYTHONPATH="$SPARKLIB"
 
 ENV BINPATH="$PATH"
 
@@ -100,4 +100,4 @@ RUN dnf -y update \
 && dnf -y clean all \
 && rm -rf /var/cache
 
-CMD ${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash
+CMD ["sh", "-c", "${FINK_BROKER_ROOT}/sentinel/start_services.sh && /bin/bash"]
