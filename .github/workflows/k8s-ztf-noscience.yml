@@ -1,4 +1,4 @@
-name: "Build K8s ZTF NoScience image"
+name: "build-image: platform=k8s, survey=ztf, science=false"
 
 on:
   push:

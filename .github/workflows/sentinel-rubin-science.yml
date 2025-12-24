@@ -1,4 +1,4 @@
-name: "Build Sentinel Rubin image"
+name: "build-image: platform=sentinel, survey=rubin, science=true"
 
 on:
   push:
@@ -8,13 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  sentinel-rubin:
+  sentinel-rubin-science:e:
     uses: ./.github/workflows/build-image-template.yml
     with:
       target: sentinel
       survey: rubin
       suffix: ""
-      artifact_name: sentinel-rubin
+      artifact_name: sentinel-rubin-sciencen-science-true
       ciux_suffix: sentinel-rubin
     secrets:
       registry_username: ${{ secrets.REGISTRY_USERNAME }}

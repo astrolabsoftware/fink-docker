@@ -1,4 +1,4 @@
-name: "Build K8s Rubin NoScience image"
+name: "build-image: platform=k8s, survey=rubin, science=false"
 
 on:
   push:
