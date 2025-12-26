@@ -8,13 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  sentinel-rubin-science:e:
+  sentinel-rubin-science:
     uses: ./.github/workflows/build-image-template.yml
     with:
       target: sentinel
       survey: rubin
       suffix: ""
-      artifact_name: sentinel-rubin-sciencen-science-true
+      artifact_name: sentinel-rubin-science
       ciux_suffix: sentinel-rubin
     secrets:
       registry_username: ${{ secrets.REGISTRY_USERNAME }}
