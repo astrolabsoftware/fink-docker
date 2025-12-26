@@ -51,6 +51,13 @@ ENV JMX_EXPORTER_AGENT_VERSION=1.1.0
 ADD https://github.com/prometheus/jmx_exporter/releases/download/${JMX_EXPORTER_AGENT_VERSION}/jmx_prometheus_javaagent-${JMX_EXPORTER_AGENT_VERSION}.jar /opt/spark/jars
 RUN chmod 644 /opt/spark/jars/jmx_prometheus_javaagent-${JMX_EXPORTER_AGENT_VERSION}.jar
 
+# Main process will run as spark_uid
+# RW access to $HOME/.conda my be required for miniconda install (at least for version py311_25.1.1-2)
+ENV HOME=/home/fink-broker
+RUN mkdir -p $HOME && chown ${spark_uid} $HOME
+
+WORKDIR $HOME
+
 USER ${spark_uid}
 
 # Copy survey-specific files and install scripts
