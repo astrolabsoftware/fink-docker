@@ -36,7 +36,7 @@ This repository provides a unified build system with the following structure:
 
 ## Workflow
 
-We mainly use these in the Continuous Integration of various repositories. The image is built at each release of this repository: 
+We mainly use these in the Continuous Integration of various repositories. The image is built at each release of this repository:
 
 ```
 # push modifications
@@ -46,7 +46,7 @@ git push origin --tags
 # then publish release on GH
 ```
 
-The code is currently checked on `Almalinux:9`. 
+The code is currently checked on `Almalinux:9`.
 
 | | Latest |
 |-|-----|
@@ -65,26 +65,23 @@ Usage: build-images.sh [options]
 
   Available options:
     -h                  this message
-    -t TARGET           target to build: k8s, rubin, ztf
-    -s SUFFIX           image suffix for k8s builds: noscience, science (default: science)
-    -i SURVEY           survey for k8s builds: ztf, rubin (default: ztf)
-    --tag TAG          docker tag name (required for rubin/ztf builds)
+    -t TARGET           target to build: k8s, sentinel
+    --noscience         build noscience image (k8s only, default: science)
+    -i SURVEY           survey: ztf, rubin (default: ztf)
     --verbose           verbose build output
-    --run              run the container after build (for rubin/ztf)
 
 Build Fink Docker images:
   - k8s: Build Kubernetes image using Dockerfile.k8s
-  - rubin: Build local development image for Rubin survey
-  - ztf: Build local development image for ZTF survey
+  - sentinel: Build sentinel development image (specify survey with -i)
 
 Examples:
-  build-images.sh -t k8s -s noscience -i ztf     # K8s noscience image for ZTF
-  build-images.sh -t k8s -s science -i rubin     # K8s science image for Rubin
-  build-images.sh -t rubin --tag myrubin:latest  # Local Rubin image
-  build-images.sh -t ztf --tag myztf:latest      # Local ZTF image
+  build-images.sh -t k8s --noscience -i ztf        # K8s noscience image for ZTF
+  build-images.sh -t k8s -i rubin                  # K8s science image for Rubin
+  build-images.sh -t sentinel -i rubin             # Sentinel Rubin image
+  build-images.sh -t sentinel -i ztf               # Sentinel ZTF image
 ```
 
-This unified script replaces the previous separate build processes and supports both local development images (rubin/ztf) and Kubernetes deployment images.
+This unified script replaces the previous separate build processes and supports both local development images (called Sentinel) and Kubernetes deployment images for both survey 'rubin' and 'ztf'.
 
 ### Building an image
 
@@ -92,26 +89,29 @@ Use the `build-images.sh` script for building images. This unified build script 
 
 ```bash
 # Build local development image for ZTF survey
-./build-images.sh -t ztf --tag dev
+./build-images.sh -t sentinel -i ztf
 
 # Build local development image for Rubin survey
-./build-images.sh -t rubin --tag rubin-dev
+./build-images.sh -t sentinel -i rubin
 
 # Build Kubernetes science image for ZTF
-./build-images.sh -t k8s -s science -i ztf
+./build-images.sh -t k8s -i ztf
 
 # Build Kubernetes noscience image for Rubin
-./build-images.sh -t k8s -s noscience -i rubin
+./build-images.sh -t k8s --noscience -i rubin
 ```
 
 ### Start a container
 
 ```bash
-# Build the ZTF development image
-./build-images.sh -t ztf --tag dev
+# Build a sentinel image for ZTF survey
+./build-images.sh -t sentinel -i ztf
 
-# Then run a container from the built image
-docker run -it --rm <image-name> bash
+# Or use the run_sentinel.sh script to run pre-built images
+./run_sentinel.sh -t ztf
+
+# Run an existing image manually
+docker run -it --rm <image_tag> bash
 ```
 
 Note that when starting a container, a script is launched to automatically start Apache HBase and Apache Kafka. Several environment variables are already defined inside the container (see each Dockerfile specifically).
