@@ -2,7 +2,7 @@ name: "build-image: platform=sentinel, survey=ztf, science=true"
 
 on:
   push:
-    branches: [main, 1096-add-fink-broker-dockerfile-for-k8s]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
