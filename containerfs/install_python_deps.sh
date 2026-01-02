@@ -117,7 +117,7 @@ if [[ "$MODE" == "noscience" ]]; then
     echo "Installing requirements (base + test) together to avoid dependency conflicts..."
     pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements.txt" -r "${REQUIREMENTS_PATH}/requirements-test.txt"
 elif [[ "$MODE" == "science" ]]; then
-# Install science dependencies for science mode
+    # Install science dependencies for science mode
     echo "Installing requirements (base + test + science) together to avoid dependency conflicts..."
     pip install --no-cache-dir -r "${REQUIREMENTS_PATH}/requirements.txt" -r "${REQUIREMENTS_PATH}/requirements-test.txt" -r "${REQUIREMENTS_PATH}/requirements-science.txt"
 
