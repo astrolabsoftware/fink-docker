@@ -107,11 +107,11 @@ Use the `build-images.sh` script for building images. This unified build script 
 ### Start a container
 
 ```bash
-# Build and run a container based on the ZTF development image
-./build-images.sh -t ztf --tag dev --run
+# Build the ZTF development image
+./build-images.sh -t ztf --tag dev
 
-# Or run an existing image
-docker run -it --rm dev bash
+# Then run a container from the built image
+docker run -it --rm <image-name> bash
 ```
 
 Note that when starting a container, a script is launched to automatically start Apache HBase and Apache Kafka. Several environment variables are already defined inside the container (see each Dockerfile specifically).
