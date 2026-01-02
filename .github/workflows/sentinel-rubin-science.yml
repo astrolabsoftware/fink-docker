@@ -1,0 +1,21 @@
+name: "build-image: platform=sentinel, survey=rubin, science=true"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sentinel-rubin-science:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: sentinel
+      survey: rubin
+      suffix: ""
+      artifact_name: sentinel-rubin-science
+      ciux_suffix: sentinel-rubin
+    secrets:
+      registry_username: ${{ secrets.REGISTRY_USERNAME }}
+      registry_token: ${{ secrets.REGISTRY_TOKEN }}

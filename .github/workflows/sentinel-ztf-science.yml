@@ -1,0 +1,21 @@
+name: "build-image: platform=sentinel, survey=ztf, science=true"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sentinel-ztf-science:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: sentinel
+      survey: ztf
+      suffix: ""
+      artifact_name: sentinel-ztf-science
+      ciux_suffix: sentinel-ztf
+    secrets:
+      registry_username: ${{ secrets.REGISTRY_USERNAME }}
+      registry_token: ${{ secrets.REGISTRY_TOKEN }}

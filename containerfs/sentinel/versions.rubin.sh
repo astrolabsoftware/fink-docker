@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright 2019-2025 AstroLab Software
-# Author: Julien Peloton
+# Author: Fabrice Jammes
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -e
 
-message_help="""
-Install Python dependencies for fink-broker through pip\n\n
-Usage:\n
-    \t./install_python_deps.sh \n\n
-"""
-# Dependencies
-pip install --no-cache-dir -r deps/requirements.txt -r deps/requirements-science.txt -r deps/requirements-test.txt
-
-pip install -r deps/requirements-science-no-deps.txt --no-deps
+# Software versions for Rubin survey (Python version managed separately)
+export SPARK_VERSION=3.4.3
+export HBASE_VERSION=2.5.8
+export KAFKA_VERSION=3.8.1
+export HADOOP_VERSION=hadoop3

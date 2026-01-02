@@ -1,0 +1,21 @@
+name: "build-image: platform=k8s, survey=rubin, science=false"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k8s-rubin-noscience:
+    uses: ./.github/workflows/build-image-template.yml
+    with:
+      target: k8s
+      survey: rubin
+      suffix: noscience
+      artifact_name: k8s-rubin-noscience
+      ciux_suffix: noscience-rubin
+    secrets:
+      registry_username: ${{ secrets.REGISTRY_USERNAME }}
+      registry_token: ${{ secrets.REGISTRY_TOKEN }}
