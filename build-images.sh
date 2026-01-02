@@ -129,7 +129,7 @@ build_k8s() {
 
     echo "Building K8s image for $SURVEY survey with $SUFFIX target"
 
-    # This command avoid building if not needed
+    # This command avoids building if not needed
     SUFFIX="$SUFFIX-$SURVEY"
     $(ciux get image --check "$DIR" --suffix "$SUFFIX" --env)
 
