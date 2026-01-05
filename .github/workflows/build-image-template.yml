@@ -88,7 +88,7 @@ jobs:
           echo "image-url=$CIUX_IMAGE_URL" >> "$GITHUB_OUTPUT"
           echo "new-build=$CIUX_BUILD" >> "$GITHUB_OUTPUT"
 
-      - name: Login to DockerHub
+      - name: Login to GitLab Registry
         uses: docker/login-action@v2
         if: steps.build.outputs.new-build == 'true'
         with:
