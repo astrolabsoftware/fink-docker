@@ -6,6 +6,27 @@ This repository contains the unified Docker build system for Fink. It centralize
 
 **This project only builds images with dependencies.** The fink-broker source code is embedded inside the images in the [fink-broker/](https://github.com/astrolabsoftware/fink-broker) repository and CI. The build procedure for Kubernetes (k8s) and sentinel images are now mutualized in this repository.
 
+## Prerequisites
+
+To build images, you need:
+
+- **Go 1.23+**: Required for ciux installation
+- **ciux v0.0.7+**: Container image build utility
+
+### Installing ciux
+
+1. Install Go 1.23+ and ensure it's in your PATH:
+   ```bash
+   export PATH=$(go env GOPATH)/bin:$PATH
+   ```
+
+2. Install ciux v0.0.7+:
+   ```bash
+   go install github.com/k8s-school/ciux@v0.0.7-rc1
+   ```
+
+For detailed installation instructions, see: https://github.com/k8s-school/ciux/blob/main/README.md#installation
+
 ### Image Types and Sizes
 
 The dependency images are built for different purposes with varying sizes:
