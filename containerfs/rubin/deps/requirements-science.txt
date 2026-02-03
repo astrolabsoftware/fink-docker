@@ -18,6 +18,7 @@ h5py
 natsort
 colorama
 seaborn
+tqdm
 
 # SNAD
 light-curve[full]==0.10.4
