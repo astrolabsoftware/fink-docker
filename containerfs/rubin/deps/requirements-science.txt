@@ -24,7 +24,7 @@ tqdm
 light-curve[full]==0.10.4
 
 # CATS dependencies
-tensorflow-cpu==2.19.0
+tensorflow==2.19.0
 
 # Orphans
 iminuit==2.31.1
